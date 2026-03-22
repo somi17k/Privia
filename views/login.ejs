@@ -1,12 +1,42 @@
-<div class="card mx-auto mt-5 p-4" style="max-width: 400px;">
-  <h2 class="text-center mb-3">Login to Privia</h2>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Privia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-  <form action="/users/login" method="POST">
-    <input class="form-control mb-2" type="email" name="username" placeholder="Email" required>
-    <input class="form-control mb-2" type="password" name="password" placeholder="Password" required>
+<body style="background: linear-gradient(135deg, #0d6efd, #6610f2); min-height:100vh; display:flex; align-items:center; justify-content:center;">
 
-    <button class="btn btn-primary w-100">Login</button>
-  </form>
+  <div class="card shadow-lg p-4" style="width: 350px; border-radius:15px;">
+    
+    <div class="text-center mb-3">
+      <h2 class="fw-bold text-primary">Privia</h2>
+      <p class="text-muted small">Secure Identity Login</p>
+    </div>
 
-  <a href="/users/register" class="d-block text-center mt-2">Create account</a>
-</div>
+    <form action="/users/login" method="POST">
+
+      <div class="form-group mb-3">
+        <input type="email" name="email" class="form-control" placeholder="Email" required>
+      </div>
+
+      <div class="form-group mb-3">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+      </div>
+
+      <button class="btn w-100 text-white"
+              style="background: linear-gradient(90deg, #0d6efd, #6610f2); border:none;">
+        Login
+      </button>
+
+    </form>
+
+    <p class="text-center mt-3 small">
+      Don’t have an account?
+      <a href="/users/register">Register</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
