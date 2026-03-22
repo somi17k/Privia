@@ -1,0 +1,159 @@
+<div class="container py-5">
+
+  <div class="text-center mb-5">
+    <h1 class="fw-bold"
+        style="background: linear-gradient(90deg, #0d6efd, #6610f2);
+               background-clip: text;
+               -webkit-background-clip: text;
+               color: transparent;">
+      Admin Dashboard
+    </h1>
+    <p class="text-muted">
+      Verify user identities securely
+    </p>
+  </div>
+
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-4">
+
+      <h4 class="fw-semibold text-primary mb-4">
+        Registered Users
+      </h4>
+
+      <% if (users && users.length > 0) { %>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+
+            <thead class="text-white"
+                   style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
+              <tr>
+                <th>Name</th>
+                <th>ID Proof</th>
+                <th>Claim Status</th>
+                <th>User Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% users.forEach((user) => { %>
+
+                <%
+                  const emailClaim = user.claims?.find(
+                    c => c.type === 'email_verified'
+                  );
+                %>
+
+                <tr>
+
+                  <!-- NAME -->
+                  <td class="fw-semibold">
+                    <%= user.name %>
+                    <% if (user.verified) { %>
+                      <span class="text-success ms-2">✔</span>
+                    <% } %>
+                  </td>
+
+                  <!-- ID PROOF -->
+                  <td>
+                    <% if (user.idProof) { %>
+                      <a href="/uploads/<%= user.idProof %>" target="_blank">
+                        <img src="/uploads/<%= user.idProof %>"
+                             width="60"
+                             class="rounded shadow-sm">
+                      </a>
+                    <% } else { %>
+                      <span class="text-muted">No proof</span>
+                    <% } %>
+                  </td>
+
+                  <!-- CLAIM STATUS -->
+                  <td>
+                    <% if (emailClaim && emailClaim.verified) { %>
+                      <span class="badge bg-success px-3 py-2">Verified</span>
+                    <% } else { %>
+                      <span class="badge bg-warning text-dark px-3 py-2">
+                        Pending
+                      </span>
+                    <% } %>
+                  </td>
+
+                  <!-- USER STATUS -->
+                  <td>
+                    <% if (user.verified) { %>
+                      <span class="badge bg-success px-3 py-2">
+                        Approved
+                      </span>
+                    <% } else { %>
+                      <span class="badge bg-secondary px-3 py-2">
+                        Unapproved
+                      </span>
+                    <% } %>
+                  </td>
+
+                  <!-- ACTIONS -->
+                  <td>
+
+                    <% if (!user.verified) { %>
+                      <form action="/admin/approve-user/<%= user._id %>" method="POST" class="mb-2">
+                        <button type="submit"
+                                class="btn btn-sm btn-primary shadow-sm">
+                          ✔ Approve User
+                        </button>
+                      </form>
+                    <% } %>
+
+                    <% if (emailClaim && !emailClaim.verified) { %>
+                      <form action="/admin/verify/<%= user._id %>/email_verified"
+                            method="POST">
+                        <button type="submit"
+                                class="btn btn-sm btn-success shadow-sm">
+                          🔒 Verify Claim
+                        </button>
+                      </form>
+                    <% } %>
+
+                    <% if (user.verified && (!emailClaim || emailClaim.verified)) { %>
+                      <span class="text-muted">—</span>
+                    <% } %>
+
+                  </td>
+
+                </tr>
+
+              <% }) %>
+            </tbody>
+
+          </table>
+        </div>
+
+      <% } else { %>
+
+        <div class="alert alert-info">
+          No users found yet.
+        </div>
+
+      <% } %>
+
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <p class="text-muted">
+      Total Users: <strong><%= users.length %></strong>
+    </p>
+
+    <a href="/dashboard" class="btn btn-outline-primary shadow-sm">
+      ⬅ Back to Dashboard
+    </a>
+  </div>
+
+</div>
+
+<style>
+button:hover {
+  transform: scale(1.03);
+  transition: 0.2s ease;
+}
+</style>

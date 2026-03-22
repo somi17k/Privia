@@ -1,12 +1,69 @@
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
-    <div class="card card-body text-center">
-      <h1><i class="fab fa-node-js fa-3x"></i></h1>
-      <p>Create an account or login</p>
-      <a href="/users/register" class="btn btn-primary btn-block mb-2"
-        >Register</a
-      >
-      <a href="/users/login" class="btn btn-secondary btn-block">Login</a>
+<div class="text-center py-5">
+  <!-- ✅ Hero Section -->
+  <div class="container">
+    <h1 class="fw-bold display-5" style="background: linear-gradient(90deg, #0d6efd, #6610f2); background-clip: text; -webkit-background-clip: text; color: transparent;">
+      Welcome to Privia
+    </h1>
+    <p class="lead mt-3 text-muted">
+      Your privacy-preserving identity verification platform — verify who you are without exposing your personal data.
+    </p>
+
+    <% if (!user) { %>
+      <a href="/users/register" class="btn btn-primary btn-lg mt-4" style="background: linear-gradient(90deg, #0d6efd, #6610f2); border: none;">
+        Get Started
+      </a>
+      <a href="/users/login" class="btn btn-outline-primary btn-lg mt-4 ms-2">Login</a>
+    <% } else { %>
+      <a href="/dashboard" class="btn btn-primary btn-lg mt-4" style="background: linear-gradient(90deg, #0d6efd, #6610f2); border: none;">
+        Go to Dashboard
+      </a>
+    <% } %>
+  </div>
+
+  <!-- ✅ Divider -->
+  <hr class="my-5 w-75 mx-auto">
+
+  <!-- ✅ How It Works Section -->
+  <div class="container my-5">
+    <h2 class="fw-semibold mb-4">How Privia Works</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="mb-3"><i class="bi bi-shield-lock text-primary fs-1"></i></div>
+            <h5 class="fw-bold">1. Secure Registration</h5>
+            <p class="text-muted">Your personal information is encrypted using AES before being stored in our database.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="mb-3"><i class="bi bi-key text-primary fs-1"></i></div>
+            <h5 class="fw-bold">2. Privacy-Preserving Verification</h5>
+            <p class="text-muted">We verify your identity using cryptographic proofs — not raw data, ensuring full privacy.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-body">
+            <div class="mb-3"><i class="bi bi-person-check text-primary fs-1"></i></div>
+            <h5 class="fw-bold">3. Instant Access</h5>
+            <p class="text-muted">Once verified, access your Privia dashboard and manage your digital identity safely.</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- ✅ CTA Section -->
+  <div class="bg-light py-5 mt-5">
+    <h2 class="fw-bold">Protect your identity. Own your privacy.</h2>
+    <% if (!user) { %>
+      <a href="/users/register" class="btn btn-lg mt-3" style="background: linear-gradient(90deg, #0d6efd, #6610f2); color: #fff; border: none;">Join Privia Today</a>
+    <% } else { %>
+      <a href="/dashboard" class="btn btn-lg mt-3" style="background: linear-gradient(90deg, #0d6efd, #6610f2); color: #fff; border: none;">Go to Dashboard</a>
+    <% } %>
   </div>
 </div>

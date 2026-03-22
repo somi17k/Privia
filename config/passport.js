@@ -1,40 +1,90 @@
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-
-// Load User model
+const CryptoJS = require('crypto-js');
 const User = require('../models/User');
 
-module.exports = function(passport) {
+module.exports = function (passport) {
+
+  /* =========================================================
+     LOCAL STRATEGY (LOGIN)
+     ========================================================= */
   passport.use(
-    new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-      // Match user
-      User.findOne({
-        email: email
-      }).then(user => {
-        if (!user) {
-          return done(null, false, { message: 'That email is not registered' });
+  new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
+    try {
+      console.log("🟡 LOGIN ATTEMPT");
+      console.log("Entered email:", email);
+
+      const users = await User.find();
+      console.log("Total users in DB:", users.length);
+
+      let foundUser = null;
+
+      for (const u of users) {
+        console.log("----");
+        console.log("Raw DB email:", u.email);
+
+        let decryptedEmail = "";
+        try {
+          decryptedEmail = CryptoJS.AES.decrypt(
+            u.email,
+            process.env.SECRET_KEY
+          ).toString(CryptoJS.enc.Utf8);
+        } catch (e) {
+          console.log("Decryption error");
         }
 
-        // Match password
-        bcrypt.compare(password, user.password, (err, isMatch) => {
-          if (err) throw err;
-          if (isMatch) {
-            return done(null, user);
-          } else {
-            return done(null, false, { message: 'Password incorrect' });
-          }
-        });
-      });
-    })
-  );
+        console.log("Decrypted email:", decryptedEmail);
 
-  passport.serializeUser(function(user, done) {
+        if (decryptedEmail === email) {
+          console.log("✅ EMAIL MATCH FOUND");
+          foundUser = u;
+          break;
+        }
+      }
+
+      if (!foundUser) {
+        console.log("❌ NO USER MATCH");
+        return done(null, false, { message: 'Invalid email or password' });
+      }
+
+      const isMatch = await bcrypt.compare(password, foundUser.password);
+      console.log("Password match:", isMatch);
+
+      if (!isMatch) {
+        console.log("❌ PASSWORD MISMATCH");
+        return done(null, false, { message: 'Invalid email or password' });
+      }
+
+      console.log("✅ LOGIN SUCCESS");
+      return done(null, foundUser);
+
+    } catch (err) {
+      console.error("Passport error:", err);
+      return done(err);
+    }
+  })
+);
+
+  /* =========================================================
+     SESSION HANDLING
+     ========================================================= */
+
+  // ✅ Store ONLY MongoDB ID in session
+  passport.serializeUser((user, done) => {
     done(null, user.id);
   });
 
-  passport.deserializeUser(function(id, done) {
-    User.findById(id, function(err, user) {
-      done(err, user);
-    });
+  // ✅ Restore FULL USER OBJECT (NO DECRYPTION HERE)
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await User.findById(id);
+      if (!user) return done(null, false);
+
+      // 🔐 IMPORTANT: return raw DB user
+      return done(null, user);
+    } catch (err) {
+      console.error('Deserialize error:', err);
+      return done(err, null);
+    }
   });
 };
