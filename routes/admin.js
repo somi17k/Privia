@@ -36,13 +36,11 @@ console.log("CURRENT USER:", req.user);
 router.post('/verify/:userId/:claimType', ensureAdmin, async (req, res) => {
   try {
     const { userId, claimType } = req.params;
-
     await User.updateOne(
       { _id: userId, 'claims.type': claimType },
       {
         $set: {
-          'claims.$.verified': true,
-          verified: true
+          'claims.$.verified': true
         }
       }
     );
@@ -60,13 +58,11 @@ router.post('/approve-user/:userId', ensureAdmin, async (req, res) => {
     const userId = req.params.userId;
 
     console.log("🔥 ADMIN VERIFYING USER:", userId);
-
     await User.updateOne(
-      { _id: userId, "claims.type": "email_verified" },
+      { _id: userId },
       {
         $set: {
-          verified: true,
-          "claims.$.verified": true
+          verified: true
         }
       }
     );
