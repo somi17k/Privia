@@ -68,23 +68,23 @@ router.get('/admin', ensureAdmin, async (req, res) => {
     const users = await User.find().lean();
 
     const decryptedUsers = users.map(u => {
-  let name;
-  try {
-    name = CryptoJS.AES.decrypt(
-      u.name,
-      process.env.SECRET_KEY
-    ).toString(CryptoJS.enc.Utf8) || u.name;
-  } catch {
-    name = u.name;
-  }
+      let name;
+      try {
+        name = CryptoJS.AES.decrypt(
+          u.name,
+          process.env.SECRET_KEY
+        ).toString(CryptoJS.enc.Utf8) || u.name;
+      } catch {
+        name = u.name;
+      }
 
-  return {
-    _id: u._id,
-    name,
-    date: u.date,
-    claims: Array.isArray(u.claims) ? u.claims : []
-  };
-});
+      return {
+        _id: u._id,
+        name,
+        date: u.date,
+        claims: Array.isArray(u.claims) ? u.claims : []
+      };
+    });
 
     res.render('admin', {
       title: 'Admin Dashboard',

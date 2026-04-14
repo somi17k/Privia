@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Privia Scanner</title>
   <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
+
 <body style="text-align:center; font-family:sans-serif">
 
   <h2>🔍 Privia Identity Scanner</h2>
@@ -16,55 +18,56 @@
     const resultBox = document.getElementById("result");
 
     function onScanSuccess(decodedText) {
-  try {
-    const claim = JSON.parse(decodedText);
+      try {
+        const claim = JSON.parse(decodedText);
 
-    // 🛑 STOP camera after scan
-    html5QrCode.stop().then(() => {
-      console.log("Camera stopped");
+        // 🛑 STOP camera after scan
+        html5QrCode.stop().then(() => {
+          console.log("Camera stopped");
+        });
+
+        fetch("/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(claim)
+        })
+          .then(res => res.json())
+          .then(data => {
+            resultBox.textContent = data.valid
+              ? "✅ Identity Verified"
+              : "❌ Invalid or Tampered Proof";
+          });
+
+      } catch {
+        resultBox.textContent = "❌ Invalid QR data";
+      }
+    }
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+
+        console.log("Available cameras:", devices);
+
+        // 👉 Prefer BACK camera
+        let cameraId = devices.length > 1 ? devices[1].id : devices[0].id;
+
+        html5QrCode.start(
+          cameraId,
+          { fps: 10, qrbox: 250 },
+          onScanSuccess
+        );
+
+      } else {
+        document.getElementById("result").textContent = "❌ No camera found";
+      }
+    }).catch(err => {
+      document.getElementById("result").textContent = "❌ Camera error";
+      console.error(err);
     });
-
-    fetch("/verify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(claim)
-    })
-    .then(res => res.json())
-    .then(data => {
-      resultBox.textContent = data.valid
-        ? "✅ Identity Verified"
-        : "❌ Invalid or Tampered Proof";
-    });
-
-  } catch {
-    resultBox.textContent = "❌ Invalid QR data";
-  }
-}
-
-   const html5QrCode = new Html5Qrcode("reader");
-
-Html5Qrcode.getCameras().then(devices => {
-  if (devices && devices.length) {
-
-    console.log("Available cameras:", devices);
-
-    // 👉 Prefer BACK camera
-    let cameraId = devices.length > 1 ? devices[1].id : devices[0].id;
-
-    html5QrCode.start(
-      cameraId,
-      { fps: 10, qrbox: 250 },
-      onScanSuccess
-    );
-
-  } else {
-    document.getElementById("result").textContent = "❌ No camera found";
-  }
-}).catch(err => {
-  document.getElementById("result").textContent = "❌ Camera error";
-  console.error(err);
-});
   </script>
 
 </body>
+
 </html>

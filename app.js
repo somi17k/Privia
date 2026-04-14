@@ -1,6 +1,6 @@
 const dns = require('node:dns');
 // This forces your app to use Google's DNS to find MongoDB
-dns.setServers(['8.8.8.8', '8.8.4.4']); 
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 dns.setDefaultResultOrder('ipv4first');
 
 const express = require('express');

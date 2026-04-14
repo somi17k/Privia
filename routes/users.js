@@ -51,46 +51,46 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
     const userCount = await User.countDocuments();
     const role = userCount === 0 ? 'admin' : 'user'; // 🎩 First user = admin
     // 🔐 Create cryptographic email claim (hash only)
-const emailHash = crypto
-  .createHash('sha256')
-  .update(email.toLowerCase())
-  .digest('hex');
+    const emailHash = crypto
+      .createHash('sha256')
+      .update(email.toLowerCase())
+      .digest('hex');
 
-const emailClaim = {
-  type: 'email_verified',
-  hash: emailHash,
-  verified: false,
-  issuedAt: new Date()
-};
-// 🔒 Prevent duplicate email registrations (claim-based)
-const existingUser = await User.findOne({
-  claims: {
-    $elemMatch: {
+    const emailClaim = {
       type: 'email_verified',
-      hash: emailHash
+      hash: emailHash,
+      verified: false,
+      issuedAt: new Date()
+    };
+    // 🔒 Prevent duplicate email registrations (claim-based)
+    const existingUser = await User.findOne({
+      claims: {
+        $elemMatch: {
+          type: 'email_verified',
+          hash: emailHash
+        }
+      }
+    });
+
+    if (existingUser) {
+      req.flash('error_msg', 'Email already registered');
+      return res.redirect('/users/register');
     }
-  }
-});
+    // 🔐 Encrypt email before saving
+    const encryptedEmail = CryptoJS.AES.encrypt(
+      email,
+      process.env.SECRET_KEY
+    ).toString();
 
-if (existingUser) {
-  req.flash('error_msg', 'Email already registered');
-  return res.redirect('/users/register');
-}
-// 🔐 Encrypt email before saving
-const encryptedEmail = CryptoJS.AES.encrypt(
-  email,
-  process.env.SECRET_KEY
-).toString();
-
-// ✅ Create new user
-const newUser = new User({
-  name,
-  email: encryptedEmail,
-  password,
-  role,
-  idProof: req.file ? req.file.filename : null,
-  claims: [emailClaim]
-});
+    // ✅ Create new user
+    const newUser = new User({
+      name,
+      email: encryptedEmail,
+      password,
+      role,
+      idProof: req.file ? req.file.filename : null,
+      claims: [emailClaim]
+    });
 
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(password, salt);
