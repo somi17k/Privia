@@ -62,15 +62,6 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
       verified: false,
       issuedAt: new Date()
     };
-    // 🔒 Prevent duplicate email registrations (claim-based)
-    const existingUser = await User.findOne({
-      claims: {
-        $elemMatch: {
-          type: 'email_verified',
-          hash: emailHash
-        }
-      }
-    });
 
     if (existingUser) {
       req.flash('error_msg', 'Email already registered');
@@ -81,6 +72,14 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
       email,
       process.env.SECRET_KEY
     ).toString();
+
+    // ✅ CHECK DUPLICATE EMAIL
+    const existingUser = await User.findOne({ email: encryptedEmail });
+
+    if (existingUser) {
+      req.flash('error_msg', 'Email already registered');
+      return res.redirect('/users/register');
+    }
 
     // ✅ Create new user
     const newUser = new User({

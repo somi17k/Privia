@@ -220,9 +220,9 @@
         const ctx = qrCanvas.getContext("2d");
         ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
 
-        QRCode.toCanvas(
+        QQRCode.toCanvas(
           qrCanvas,
-          JSON.stringify(proof),
+          proof.code,
           { width: 250 },
           (error) => {
             if (error) console.error(error);
