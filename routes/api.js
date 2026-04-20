@@ -24,7 +24,7 @@ router.post('/proof', async (req, res) => {
     }
 
     const issuedAt = new Date();
-    const expiresAt = new Date(issuedAt.getTime() + 15 * 1000); // 15 seconds
+    const expiresAt = new Date(issuedAt.getTime() + 30 * 1000); // 30 seconds
     const nonce = crypto.randomBytes(16).toString('hex');
 
     const proof = {

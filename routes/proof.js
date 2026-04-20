@@ -2,7 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const User = require("../models/User");
 const router = express.Router();
-const PROOF_TTL_MS = 15 * 1000;
+const PROOF_TTL_MS = 30 * 1000;
 
 function ensureAuth(req, res, next) {
   if (req.isAuthenticated()) return next();
@@ -25,8 +25,9 @@ router.get("/", ensureAuth, async (req, res) => {
       return res.status(403).json({ error: "Claim not verified" });
     }
 
+    const shouldRegenerate = req.query.regenerate === "1" || req.query.regenerate === "true";
     const existingProof = user.activeProof;
-    if (existingProof?.code && existingProof?.expiresAt) {
+    if (!shouldRegenerate && existingProof?.code && existingProof?.expiresAt) {
       const existingExpiry = new Date(existingProof.expiresAt);
       if (existingExpiry > new Date()) {
         return res.json({
@@ -41,7 +42,7 @@ router.get("/", ensureAuth, async (req, res) => {
       "PRIVIA-" +
       crypto.randomBytes(4).toString("hex").toUpperCase();
 
-    // ⏱ Expiry (15 seconds)
+    // ⏱ Expiry (30 seconds)
     const issuedAt = new Date();
     const expiresAt = new Date(issuedAt.getTime() + PROOF_TTL_MS);
 

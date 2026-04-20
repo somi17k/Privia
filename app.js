@@ -11,6 +11,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const User = require('./models/User');
 
 require('dotenv').config();
 
@@ -25,13 +26,29 @@ app.use("/verify", require("./routes/verify"));
 
 // ✅ DB Config
 const db = require('./config/keys').mongoURI;
+const PROOF_CLEANUP_INTERVAL_MS = 30 * 1000;
+
+async function cleanupExpiredProofs() {
+  await User.updateMany(
+    { "activeProof.expiresAt": { $lte: new Date() } },
+    { $unset: { activeProof: 1 } }
+  );
+}
 
 // ✅ Connect to MongoDB
 mongoose.connect(db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-  .then(() => console.log('✅ MongoDB Connected'))
+  .then(async () => {
+    console.log('✅ MongoDB Connected');
+    await cleanupExpiredProofs();
+    setInterval(() => {
+      cleanupExpiredProofs().catch((err) => {
+        console.error('❌ Proof cleanup error:', err.message);
+      });
+    }, PROOF_CLEANUP_INTERVAL_MS);
+  })
   .catch(err => {
     console.error('❌ MongoDB Connection Error:');
     console.error(err);

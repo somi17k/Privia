@@ -34,6 +34,8 @@ router.post("/proof", async (req, res) => {
 
     const expiresAt = new Date(user.activeProof.expiresAt);
     if (new Date() > expiresAt) {
+      user.activeProof = undefined;
+      await user.save();
       return res.json({ valid: false });
     }
 

@@ -119,6 +119,9 @@
                   <button class="btn btn-lg px-4 btn-privia" id="generate-proof-btn">
                     <i class="bi bi-lock-fill me-1"></i>Generate Secure Proof
                   </button>
+                  <button class="btn btn-lg btn-outline-secondary" id="regenerate-proof-btn">
+                    <i class="bi bi-arrow-repeat me-1"></i>Regenerate
+                  </button>
                   <button class="btn btn-lg btn-outline-primary" id="show-qr-btn">
                     <i class="bi bi-camera-fill me-1"></i>Show QR Proof
                   </button>
@@ -132,7 +135,7 @@
                           <p class="small text-muted mb-1">Active Proof Code</p>
                           <p class="fw-bold mb-0" id="active-proof-code">—</p>
                         </div>
-                        <span class="badge text-bg-light text-primary border" id="proof-expiry">Valid for 15 seconds</span>
+                        <span class="badge text-bg-light text-primary border" id="proof-expiry">Valid for 30 seconds</span>
                       </div>
 
                       <div class="d-flex justify-content-center mt-3">
@@ -183,6 +186,7 @@
 
     const generateBtn = document.getElementById("generate-proof-btn");
     const qrBtn = document.getElementById("show-qr-btn");
+    const regenerateBtn = document.getElementById("regenerate-proof-btn");
     const qrCanvas = document.getElementById("qr-canvas");
     const qrWrapper = document.getElementById("qr-wrapper");
     const proofExpiry = document.getElementById("proof-expiry");
@@ -192,7 +196,7 @@
     const proofCode = document.getElementById("proof-code");
     const copyProofBtn = document.getElementById("copy-proof-btn");
 
-    if (!generateBtn || !qrBtn) return; // stops JS for unverified users
+    if (!generateBtn || !qrBtn || !regenerateBtn) return; // stops JS for unverified users
 
     const proofModal = new bootstrap.Modal(proofModalEl);
     let latestProof = null;
@@ -221,8 +225,9 @@
       countdownTimer = setInterval(update, 1000);
     }
 
-    async function fetchProof() {
-      const res = await fetch("/proof");
+    async function fetchProof(forceRegenerate = false) {
+      const url = forceRegenerate ? "/proof?regenerate=1" : "/proof";
+      const res = await fetch(url);
       const proof = await res.json();
 
       if (!res.ok || !proof.code) {
@@ -262,6 +267,21 @@
         proofModal.show();
       } catch (err) {
         proofCode.textContent = "Error generating proof";
+      }
+    });
+
+    regenerateBtn.addEventListener("click", async () => {
+      regenerateBtn.disabled = true;
+      try {
+        const proof = await fetchProof(true);
+        proofCode.textContent = proof.code;
+        if (!qrWrapper.classList.contains("d-none")) {
+          renderQr(proof);
+        }
+      } catch (err) {
+        alert("Failed to regenerate proof");
+      } finally {
+        regenerateBtn.disabled = false;
       }
     });
 
