@@ -1,9 +1,9 @@
 <div class="container py-4 py-lg-5">
-  <div class="dashboard-hero surface-card mb-4">
+  <div class="dashboard-hero surface-card mb-4 reveal-on-scroll">
     <div class="card-body p-4 p-lg-5">
       <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
         <div>
-          <p class="text-uppercase text-primary fw-semibold mb-1 small">Privia Identity Dashboard</p>
+          <p class="text-uppercase text-info fw-semibold mb-1 small">Privia Identity Dashboard</p>
           <h1 class="fw-bold mb-1">Welcome, <%= user.name %></h1>
           <p class="text-muted mb-0">Manage privacy-first verification and proof sharing.</p>
         </div>
@@ -16,7 +16,7 @@
 
   <div class="row g-3 mb-4">
     <div class="col-md-4">
-      <div class="surface-card h-100">
+      <div class="surface-card h-100 reveal-on-scroll">
         <div class="card-body p-4">
           <i class="bi bi-stars text-primary mb-2 d-inline-block"></i>
           <p class="text-muted mb-1">Trust Level</p>
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="col-md-4">
-      <div class="surface-card h-100">
+      <div class="surface-card h-100 reveal-on-scroll">
         <div class="card-body p-4">
           <i class="bi bi-patch-check text-primary mb-2 d-inline-block"></i>
           <p class="text-muted mb-1">Email Claim</p>
@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="col-md-4">
-      <div class="surface-card h-100">
+      <div class="surface-card h-100 reveal-on-scroll">
         <div class="card-body p-4">
           <i class="bi bi-calendar-event text-primary mb-2 d-inline-block"></i>
           <p class="text-muted mb-1">Member Since</p>
@@ -46,7 +46,7 @@
 
   <div class="row g-3 mb-4">
     <div class="col-md-4">
-      <div class="surface-card h-100 dashboard-feature-card">
+      <div class="surface-card h-100 dashboard-feature-card reveal-on-scroll">
         <div class="card-body text-center p-4">
           <i class="bi bi-shield-lock fs-3 text-primary"></i>
           <h5 class="fw-semibold mt-2">Security</h5>
@@ -55,7 +55,7 @@
       </div>
     </div>
     <div class="col-md-4">
-      <div class="surface-card h-100 dashboard-feature-card">
+      <div class="surface-card h-100 dashboard-feature-card reveal-on-scroll">
         <div class="card-body text-center p-4">
           <i class="bi bi-file-earmark-check fs-3 text-primary"></i>
           <h5 class="fw-semibold mt-2">Claims</h5>
@@ -64,7 +64,7 @@
       </div>
     </div>
     <div class="col-md-4">
-      <div class="surface-card h-100 dashboard-feature-card">
+      <div class="surface-card h-100 dashboard-feature-card reveal-on-scroll">
         <div class="card-body text-center p-4">
           <i class="bi bi-qr-code fs-3 text-primary"></i>
           <h5 class="fw-semibold mt-2">QR Verification</h5>
@@ -74,7 +74,7 @@
     </div>
   </div>
 
-  <div class="surface-card">
+  <div class="surface-card reveal-on-scroll">
     <div class="card-body p-4 p-lg-5">
       <h4 class="fw-bold text-primary mb-4">Account Overview</h4>
 
@@ -113,8 +113,8 @@
 
             <hr class="my-4">
 
-            <% if (user.verified) { %>
-              <div class="text-center">
+              <% if (user.verified) { %>
+                <div class="text-center">
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                   <button class="btn btn-lg px-4 btn-privia" id="generate-proof-btn">
                     <i class="bi bi-lock-fill me-1"></i>Generate Secure Proof
@@ -126,8 +126,9 @@
                     <i class="bi bi-camera-fill me-1"></i>Show QR Proof
                   </button>
                 </div>
+                <p class="small text-muted mt-2 mb-0" id="proof-state"></p>
 
-                <div class="mt-3 d-none" id="qr-wrapper">
+                <div class="mt-3 d-none" id="proof-inline-panel">
                   <div class="card border-0 shadow-sm proof-panel mx-auto">
                     <div class="card-body p-3 p-md-4">
                       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -135,9 +136,18 @@
                           <p class="small text-muted mb-1">Active Proof Code</p>
                           <p class="fw-bold mb-0" id="active-proof-code">—</p>
                         </div>
-                        <span class="badge text-bg-light text-primary border" id="proof-expiry">Valid for 30 seconds</span>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="badge text-bg-light text-primary border" id="proof-expiry">Valid for 30 seconds</span>
+                          <button type="button" class="btn btn-sm btn-outline-primary" id="copy-proof-btn">Copy Code</button>
+                        </div>
                       </div>
+                    </div>
+                  </div>
+                </div>
 
+                <div class="mt-3 d-none" id="qr-wrapper">
+                  <div class="card border-0 shadow-sm proof-panel mx-auto">
+                    <div class="card-body p-3 p-md-4">
                       <div class="d-flex justify-content-center mt-3">
                         <div class="qr-frame">
                           <canvas id="qr-canvas"></canvas>
@@ -159,24 +169,16 @@
     </div>
   </div>
 
-  <div class="modal fade" id="proofModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4 border-0 shadow">
-        <div class="modal-header border-0">
-          <h5 class="modal-title fw-bold text-primary">Proof Generated</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body text-center">
-          <p class="text-muted mb-3">Use this temporary code for verification.</p>
-          <div id="proof-code" class="proof-code-box"></div>
-        </div>
-        <div class="modal-footer border-0">
-          <button type="button" class="btn btn-outline-primary" id="copy-proof-btn">Copy Code</button>
-          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
+  <div class="surface-card p-4 mt-4 reveal-on-scroll">
+    <h5 class="fw-bold mb-3">Explore More</h5>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="/how-it-works" class="btn btn-outline-primary"><i class="bi bi-diagram-3 me-1"></i>How It Works</a>
+      <a href="/security" class="btn btn-outline-primary"><i class="bi bi-shield-check me-1"></i>Security</a>
+      <a href="/about" class="btn btn-outline-primary"><i class="bi bi-info-circle me-1"></i>About Privia</a>
+      <a href="/scanner" class="btn btn-outline-primary"><i class="bi bi-qr-code-scan me-1"></i>Open Scanner</a>
     </div>
   </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
@@ -189,16 +191,14 @@
     const regenerateBtn = document.getElementById("regenerate-proof-btn");
     const qrCanvas = document.getElementById("qr-canvas");
     const qrWrapper = document.getElementById("qr-wrapper");
+    const proofInlinePanel = document.getElementById("proof-inline-panel");
     const proofExpiry = document.getElementById("proof-expiry");
     const proofCodeValueEl = document.getElementById("active-proof-code");
-
-    const proofModalEl = document.getElementById("proofModal");
-    const proofCode = document.getElementById("proof-code");
+    const proofStateEl = document.getElementById("proof-state");
     const copyProofBtn = document.getElementById("copy-proof-btn");
 
     if (!generateBtn || !qrBtn || !regenerateBtn) return; // stops JS for unverified users
 
-    const proofModal = new bootstrap.Modal(proofModalEl);
     let latestProof = null;
     let countdownTimer = null;
 
@@ -211,6 +211,8 @@
         const remainingMs = expiresAt - Date.now();
         if (remainingMs <= 0) {
           proofExpiry.textContent = "Expired";
+          if (proofStateEl) proofStateEl.textContent = "Proof expired. Click Regenerate to issue a new proof.";
+          latestProof = null;
           if (countdownTimer) clearInterval(countdownTimer);
           return;
         }
@@ -231,22 +233,29 @@
       const proof = await res.json();
 
       if (!res.ok || !proof.code) {
-        throw new Error("Proof generation failed");
+        throw new Error(proof.error || "Proof generation failed");
       }
 
       latestProof = proof;
+      if (proofInlinePanel) proofInlinePanel.classList.remove("d-none");
       if (proof.expiresAt) startExpiryCountdown(proof.expiresAt);
       if (proofCodeValueEl) proofCodeValueEl.textContent = proof.code;
+      if (proofStateEl) {
+        proofStateEl.textContent = forceRegenerate
+          ? "New proof issued for this session."
+          : "Proof is active for scanning.";
+      }
       return proof;
     }
 
     function renderQr(proof) {
       const ctx = qrCanvas.getContext("2d");
       ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+      const verificationUrl = `${window.location.origin}/verify/proof/${encodeURIComponent(proof.code)}`;
 
       QRCode.toCanvas(
         qrCanvas,
-        proof.code,
+        verificationUrl,
         { width: 190, margin: 1 },
         (error) => {
           if (error) console.error(error);
@@ -256,17 +265,18 @@
 
     // 🔒 Generate JSON proof
     generateBtn.addEventListener("click", async () => {
-      proofCode.textContent = "Generating secure proof...";
+      generateBtn.disabled = true;
+      if (proofStateEl) proofStateEl.textContent = "Generating secure proof...";
 
       try {
         const proof = await fetchProof();
-        proofCode.textContent = proof.code;
         if (!qrWrapper.classList.contains("d-none")) {
           renderQr(proof);
         }
-        proofModal.show();
       } catch (err) {
-        proofCode.textContent = "Error generating proof";
+        if (proofStateEl) proofStateEl.textContent = err.message;
+      } finally {
+        generateBtn.disabled = false;
       }
     });
 
@@ -274,12 +284,11 @@
       regenerateBtn.disabled = true;
       try {
         const proof = await fetchProof(true);
-        proofCode.textContent = proof.code;
         if (!qrWrapper.classList.contains("d-none")) {
           renderQr(proof);
         }
       } catch (err) {
-        alert("Failed to regenerate proof");
+        if (proofStateEl) proofStateEl.textContent = err.message || "Failed to regenerate proof";
       } finally {
         regenerateBtn.disabled = false;
       }
@@ -291,6 +300,7 @@
         if (!qrWrapper.classList.contains("d-none")) {
           qrWrapper.classList.add("d-none");
           qrBtn.innerHTML = '<i class="bi bi-camera-fill me-1"></i>Show QR Proof';
+          if (proofStateEl) proofStateEl.textContent = "QR proof hidden.";
           return;
         }
 
@@ -298,14 +308,15 @@
         renderQr(proof);
         qrWrapper.classList.remove("d-none");
         qrBtn.innerHTML = '<i class="bi bi-eye-slash-fill me-1"></i>Hide QR Proof';
+        if (proofStateEl) proofStateEl.textContent = "QR proof ready to scan.";
       } catch (err) {
-        alert("Failed to generate QR proof");
+        if (proofStateEl) proofStateEl.textContent = err.message || "Failed to generate QR proof";
       }
     });
 
     if (copyProofBtn) {
       copyProofBtn.addEventListener("click", async () => {
-        const code = latestProof?.code || proofCode.textContent;
+        const code = latestProof?.code || proofCodeValueEl?.textContent;
         if (!code || code.includes("Generating")) return;
         try {
           await navigator.clipboard.writeText(code);
@@ -327,9 +338,15 @@
 </script>
 <style id="b8t7z2">
   .dashboard-hero {
-    background: radial-gradient(circle at top right, rgba(102, 16, 242, 0.16), transparent 45%),
-      radial-gradient(circle at top left, rgba(13, 110, 253, 0.16), transparent 45%),
-      #fff;
+    background:
+      linear-gradient(120deg, rgba(12, 25, 46, 0.54), rgba(28, 45, 74, 0.4)),
+      url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    color: #fff;
+  }
+
+  .dashboard-hero .text-muted,
+  .dashboard-hero p {
+    color: rgba(229, 237, 255, 0.9) !important;
   }
 
   .dashboard-status-pill {
@@ -344,17 +361,6 @@
   .dashboard-feature-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 0.75rem 1.25rem rgba(13, 110, 253, 0.1) !important;
-  }
-
-  .proof-code-box {
-    font-size: 28px;
-    font-weight: bold;
-    letter-spacing: 3px;
-    color: #0d6efd;
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
   }
 
   .proof-panel {

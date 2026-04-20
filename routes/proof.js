@@ -26,6 +26,10 @@ router.get("/", ensureAuth, async (req, res) => {
       return res.status(403).json({ error: "Claim not verified" });
     }
 
+    if (!user.verified) {
+      return res.status(403).json({ error: "User not approved by admin" });
+    }
+
     const shouldRegenerate = req.query.regenerate === "1" || req.query.regenerate === "true";
     if (!shouldRegenerate) {
       const existingProof = await Proof.findOne({

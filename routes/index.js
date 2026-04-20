@@ -5,35 +5,52 @@ const {
   ensureAuthenticated
 } = require('../config/auth');
 
-/* HOME / WELCOME PAGE */
+function getDisplayUser(req) {
+  if (!req.user?.name) return null;
+
+  try {
+    return {
+      name: CryptoJS.AES.decrypt(
+        req.user.name,
+        process.env.SECRET_KEY
+      ).toString(CryptoJS.enc.Utf8) || req.user.name,
+      role: req.user.role
+    };
+  } catch {
+    return {
+      name: req.user.name,
+      role: req.user.role
+    };
+  }
+}
 
 router.get('/', (req, res) => {
-  let user = null;
-
-  if (req.user?.name) {
-    try {
-      user = {
-        name: CryptoJS.AES.decrypt(
-          req.user.name,
-          process.env.SECRET_KEY
-        ).toString(CryptoJS.enc.Utf8) || req.user.name,
-        role: req.user.role
-      };
-    } catch {
-      user = {
-        name: req.user.name,
-        role: req.user.role
-      };
-    }
-  }
-
   res.render('welcome', {
     title: 'Home',
-    user
+    user: getDisplayUser(req)
   });
 });
 
-/*Dashboard*/
+router.get('/about', (req, res) => {
+  res.render('about', {
+    title: 'About Privia',
+    user: getDisplayUser(req)
+  });
+});
+
+router.get('/how-it-works', (req, res) => {
+  res.render('how-it-works', {
+    title: 'How It Works',
+    user: getDisplayUser(req)
+  });
+});
+
+router.get('/security', (req, res) => {
+  res.render('security', {
+    title: 'Security',
+    user: getDisplayUser(req)
+  });
+});
 
 router.get('/dashboard', ensureAuthenticated, (req, res) => {
   let name = 'User';

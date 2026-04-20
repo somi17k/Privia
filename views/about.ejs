@@ -1,0 +1,112 @@
+<section class="premium-panel p-4 p-lg-5 mb-4 reveal-on-scroll">
+  <div class="row g-4 align-items-center">
+    <div class="col-lg-7">
+      <span class="section-kicker">About Privia</span>
+      <h1 class="display-6 fw-bold mb-3">Privacy-preserving identity for real-world trust checks</h1>
+      <p class="lead text-white-50 mb-0">
+        Privia is built to prove identity claims without exposing full personal data. It combines encrypted storage,
+        admin-reviewed claims, and short-lived proof codes for practical, low-friction verification.
+      </p>
+    </div>
+    <div class="col-lg-5">
+      <div class="glass-card p-4 h-100">
+        <h5 class="fw-bold mb-3">Core Purpose</h5>
+        <p class="mb-0 text-muted">
+          Replace invasive identity sharing with claim-driven verification, so users reveal only what is needed for trust.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <i class="bi bi-lock-fill fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Encrypted Data</h5>
+      <p class="text-muted mb-0">Identity attributes are encrypted before storage to reduce exposure risk.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <i class="bi bi-patch-check-fill fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Verified Claims</h5>
+      <p class="text-muted mb-0">Admins validate claims to establish trust without sharing full documents downstream.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <i class="bi bi-qr-code-scan fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Temporary Proofs</h5>
+      <p class="text-muted mb-0">Short-lived, single-use proof codes keep verification contextual and time-bound.</p>
+    </div>
+  </div>
+</section>
+
+<section class="surface-card p-4 p-lg-5 reveal-on-scroll">
+  <h3 class="fw-bold mb-3">What makes Privia different</h3>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Data minimization</h6>
+        <p class="text-muted mb-0">Verification answers yes/no trust questions instead of exposing full records.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Fast verification flow</h6>
+        <p class="text-muted mb-0">Generate and scan proofs quickly via dashboard and scanner pages.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Human review where needed</h6>
+        <p class="text-muted mb-0">Admin controls add assurance for claim verification and account readiness.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">MVP-ready architecture</h6>
+        <p class="text-muted mb-0">Built with Node.js, Express, MongoDB, Passport, and EJS for incremental scaling.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .premium-panel {
+    background:
+      linear-gradient(120deg, rgba(9, 20, 40, 0.82), rgba(15, 33, 62, 0.72)),
+      url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    color: #ecf3ff;
+    border-radius: 1rem;
+    border: 1px solid rgba(150, 183, 243, 0.24);
+    box-shadow: 0 18px 34px rgba(5, 12, 26, 0.45);
+  }
+
+  .section-kicker {
+    display: inline-block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(172, 198, 250, 0.35);
+    color: #d6e5ff;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .glass-card {
+    border-radius: 0.9rem;
+    background: rgba(11, 25, 47, 0.78);
+    border: 1px solid rgba(150, 183, 243, 0.25);
+  }
+
+  .mini-feature {
+    border: 1px solid rgba(150, 183, 243, 0.22);
+    border-radius: 0.85rem;
+    padding: 1rem;
+    background: rgba(11, 25, 47, 0.74);
+  }
+</style>

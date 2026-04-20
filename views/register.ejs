@@ -1,22 +1,24 @@
-<div class="row justify-content-center py-4 py-md-5">
-  <div class="col-12 col-xl-10">
-    <div class="surface-card overflow-hidden">
+<section class="row justify-content-center py-3 py-lg-4">
+  <div class="col-12 col-xl-11">
+    <div class="surface-card overflow-hidden reveal-on-scroll">
       <div class="row g-0">
         <div class="col-lg-5 d-none d-lg-block register-side p-5">
-          <span class="badge rounded-pill text-bg-light text-primary mb-3">Privia Onboarding</span>
-          <h3 class="fw-bold text-white mb-3">Register once, verify securely, prove privately</h3>
-          <p class="text-white-50 mb-4">Your account powers claim-based identity verification without exposing raw personal details.</p>
-          <div class="small text-white-50 d-flex flex-column gap-2">
+          <span class="section-kicker">Privia Onboarding</span>
+          <h3 class="fw-bold mb-3">Register once, verify securely, prove privately</h3>
+          <p class="mb-4 text-white-50">
+            Your account enables claim-based verification, temporary proof sharing, and stronger privacy by design.
+          </p>
+          <div class="d-flex flex-column gap-2 small">
             <span><i class="bi bi-lock-fill me-2"></i>Email encrypted at rest</span>
-            <span><i class="bi bi-hash me-2"></i>Claim hash for integrity</span>
-            <span><i class="bi bi-file-earmark-check me-2"></i>Admin proof validation</span>
+            <span><i class="bi bi-hash me-2"></i>Claim hash integrity support</span>
+            <span><i class="bi bi-file-earmark-check me-2"></i>Admin proof validation flow</span>
           </div>
         </div>
 
         <div class="col-lg-7 p-4 p-md-5">
           <div class="mb-4">
             <h2 class="fw-bold mb-1">Create your Privia account</h2>
-            <p class="text-muted mb-0">Secure registration with encrypted identity data.</p>
+            <p class="text-muted mb-0">Start secure identity onboarding in a few steps.</p>
           </div>
 
           <form action="/users/register" method="POST" enctype="multipart/form-data">
@@ -53,18 +55,36 @@
             </button>
           </form>
 
-          <p class="text-center mt-4 mb-0">
-            Already have an account?
-            <a href="/users/login" class="fw-semibold">Login</a>
-          </p>
+          <div class="register-footer d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4">
+            <a href="/how-it-works" class="text-decoration-none fw-semibold">Understand verification flow</a>
+            <p class="mb-0">
+              Already have an account?
+              <a href="/users/login" class="fw-semibold">Login</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <style>
   .register-side {
-    background: linear-gradient(90deg, #0d6efd, #6610f2);
+    color: #fff;
+    background:
+      linear-gradient(120deg, rgba(9, 20, 40, 0.7), rgba(16, 33, 63, 0.58)),
+      url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+  }
+
+  .section-kicker {
+    display: inline-block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 0.85rem;
   }
 </style>

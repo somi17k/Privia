@@ -7,7 +7,52 @@ const { ensureAdmin } = require('../config/auth');
 // ✅ Admin dashboard
 router.get('/', ensureAdmin, async (req, res) => {
   try {
-    const users = await User.find().lean();
+    const status = req.query.status === 'approved' || req.query.status === 'pending'
+      ? req.query.status
+      : 'all';
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const query = {};
+    if (status === 'approved') query.verified = true;
+    if (status === 'pending') query.verified = false;
+
+    const [users, filteredTotal, totalUsers, approvedUsers, pendingClaimsAgg] = await Promise.all([
+      User.find(query).sort({ date: -1 }).skip(skip).limit(limit).lean(),
+      User.countDocuments(query),
+      User.countDocuments(),
+      User.countDocuments({ verified: true }),
+      User.aggregate([
+        {
+          $project: {
+            hasVerifiedEmailClaim: {
+              $gt: [
+                {
+                  $size: {
+                    $filter: {
+                      input: '$claims',
+                      as: 'claim',
+                      cond: {
+                        $and: [
+                          { $eq: ['$$claim.type', 'email_verified'] },
+                          { $eq: ['$$claim.verified', true] }
+                        ]
+                      }
+                    }
+                  }
+                },
+                0
+              ]
+            }
+          }
+        },
+        { $match: { hasVerifiedEmailClaim: false } },
+        { $count: 'count' }
+      ])
+    ]);
+
+    const totalPages = Math.max(Math.ceil(filteredTotal / limit), 1);
     const decryptedUsers = users.map((u) => {
       let name;
       try {
@@ -31,7 +76,22 @@ router.get('/', ensureAdmin, async (req, res) => {
 
     res.render('admin', {
       title: 'Admin Dashboard',
-      users: decryptedUsers
+      users: decryptedUsers,
+      filters: {
+        status
+      },
+      pagination: {
+        page,
+        totalPages,
+        hasPrev: page > 1,
+        hasNext: page < totalPages
+      },
+      stats: {
+        totalUsers,
+        approvedUsers,
+        pendingUsers: totalUsers - approvedUsers,
+        pendingClaims: pendingClaimsAgg[0]?.count || 0
+      }
     });
   } catch (err) {
     console.error(err);
@@ -47,15 +107,16 @@ router.post('/verify/:userId/:claimType', ensureAdmin, async (req, res) => {
       { _id: userId, 'claims.type': claimType },
       {
         $set: {
-          'claims.$.verified': true
+          'claims.$.verified': true,
+          verified: true
         }
       }
     );
 
     if (result.modifiedCount === 0) {
-      req.flash('error_msg', 'Claim not found or already verified');
+      req.flash('error_msg', 'Claim not found or already approved');
     } else {
-      req.flash('success_msg', 'Claim verified successfully');
+      req.flash('success_msg', 'Claim verified and user approved successfully');
     }
 
     res.redirect('/admin');

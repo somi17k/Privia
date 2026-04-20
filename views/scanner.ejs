@@ -1,28 +1,54 @@
-<div class="row justify-content-center py-4 py-md-5">
-  <div class="col-12 col-lg-8">
-    <div class="card border-0 shadow-lg rounded-4">
+<div class="row justify-content-center py-2 py-md-4">
+  <div class="col-12 col-lg-10">
+    <div class="card border-0 shadow-lg rounded-4 scanner-hero reveal-on-scroll">
       <div class="card-body p-4 p-md-5 text-center">
-        <h2 class="fw-bold mb-2">Privia Scanner</h2>
-        <p class="text-muted mb-4">Scan a temporary proof QR and verify claim validity instantly.</p>
+        <h2 class="fw-bold mb-2 text-white">Privia Verification Scanner</h2>
+        <p class="mb-4 text-light-emphasis">
+          Scan temporary proof QR and receive real-time validity response from secure backend checks.
+        </p>
 
         <div class="scanner-frame mx-auto mb-3">
           <div id="reader"></div>
         </div>
 
-        <div id="result" class="alert alert-secondary mb-3">Ready to scan</div>
+        <div id="result" class="alert alert-secondary mb-3">Click "Start Scan" to begin</div>
 
-        <button id="restart-scan" type="button" class="btn btn-outline-primary d-none">
-          Scan Another Proof
-        </button>
+        <div class="d-flex justify-content-center flex-wrap gap-2">
+          <button id="start-scan" type="button" class="btn btn-privia">
+            Start Scan
+          </button>
+          <a href="/how-it-works" class="btn btn-outline-light">How verification works</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<section class="row g-3 mt-1 mb-4">
+  <div class="col-md-4">
+    <div class="surface-card p-3 h-100 reveal-on-scroll">
+      <h6 class="fw-bold mb-1">1. Proof exists</h6>
+      <p class="small text-muted mb-0">Backend checks whether code is valid and linked to stored proof.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="surface-card p-3 h-100 reveal-on-scroll">
+      <h6 class="fw-bold mb-1">2. Proof still valid</h6>
+      <p class="small text-muted mb-0">Expired proofs are rejected immediately with reason-specific response.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="surface-card p-3 h-100 reveal-on-scroll">
+      <h6 class="fw-bold mb-1">3. User approved</h6>
+      <p class="small text-muted mb-0">Verification only passes if the linked user is approved by admin.</p>
+    </div>
+  </div>
+</section>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
   const resultBox = document.getElementById("result");
-  const restartBtn = document.getElementById("restart-scan");
+  const startBtn = document.getElementById("start-scan");
   const html5QrCode = new Html5Qrcode("reader");
   let selectedCameraId = null;
   let scanActive = false;
@@ -33,14 +59,25 @@
   }
 
   async function startScanner() {
-    if (!selectedCameraId || scanActive) return;
+    if (scanActive) return;
+
+    if (!selectedCameraId) {
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || !devices.length) {
+        setResult("danger", "No camera found");
+        return;
+      }
+      selectedCameraId = devices.length > 1 ? devices[1].id : devices[0].id;
+    }
+
     await html5QrCode.start(
       selectedCameraId,
       { fps: 10, qrbox: 250 },
       onScanSuccess
     );
     scanActive = true;
-    restartBtn.classList.add("d-none");
+    startBtn.disabled = true;
+    startBtn.textContent = "Scanning...";
     setResult("secondary", "Ready to scan");
   }
 
@@ -54,25 +91,28 @@
         return;
       }
 
-      let endpoint = "/verify/proof";
       let payload = { code: scannedValue };
 
       try {
         const parsed = JSON.parse(scannedValue);
         if (parsed && typeof parsed.code === "string") {
           payload = { code: parsed.code };
-        } else {
-          endpoint = "/verify";
-          payload = parsed;
         }
       } catch {
-        payload = { code: scannedValue };
+        const pathMatch = scannedValue.match(/\/verify\/proof\/([^/?#]+)/i);
+        if (pathMatch && pathMatch[1]) {
+          payload = { code: decodeURIComponent(pathMatch[1]) };
+        } else {
+          payload = { code: scannedValue };
+        }
       }
 
       await html5QrCode.stop();
       scanActive = false;
+      startBtn.disabled = false;
+      startBtn.textContent = "Scan Another Proof";
 
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/verify-proof", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -80,44 +120,62 @@
       const data = await res.json();
 
       if (data.valid) {
-        setResult("success", "Identity verified");
+        const verifiedName = data.user?.name ? ` for ${data.user.name}` : "";
+        setResult("success", `Identity verified${verifiedName}`);
       } else {
-        setResult("danger", "Invalid or expired proof");
+        if (data.reason === "expired") {
+          setResult("warning", "Proof expired. Ask user to regenerate a new proof.");
+        } else if (data.reason === "user not approved") {
+          setResult("danger", "User is not approved by admin.");
+        } else {
+          setResult("danger", "Invalid proof code.");
+        }
       }
-      restartBtn.classList.remove("d-none");
     } catch (err) {
       setResult("danger", "Verification failed");
-      restartBtn.classList.remove("d-none");
+      startBtn.disabled = false;
+      startBtn.textContent = "Scan Another Proof";
     }
   }
 
-  Html5Qrcode.getCameras().then(async (devices) => {
-    if (!devices || !devices.length) {
-      setResult("danger", "No camera found");
-      return;
-    }
-
-    selectedCameraId = devices.length > 1 ? devices[1].id : devices[0].id;
-    await startScanner();
-  }).catch(() => {
-    setResult("danger", "Camera access failed");
-  });
-
-  restartBtn.addEventListener("click", async () => {
+  startBtn.addEventListener("click", async () => {
     try {
+      setResult("secondary", "Starting camera...");
       await startScanner();
     } catch {
-      setResult("danger", "Could not restart scanner");
+      setResult("danger", "Camera access failed");
+      startBtn.disabled = false;
+      startBtn.textContent = "Start Scan";
     }
   });
 </script>
 
 <style>
+  .scanner-hero {
+    background:
+      linear-gradient(120deg, rgba(12, 25, 46, 0.56), rgba(28, 45, 74, 0.4)),
+      url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+  }
+
   .scanner-frame {
     max-width: 360px;
-    border: 1px solid #e9ecef;
+    border: 1px solid rgba(255, 255, 255, 0.38);
     border-radius: 14px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.95);
     padding: 12px;
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.25);
+    animation: scannerPulse 2.2s infinite;
+  }
+
+  @keyframes scannerPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.24);
+    }
+    70% {
+      box-shadow: 0 0 0 12px rgba(13, 110, 253, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+    }
   }
 </style>

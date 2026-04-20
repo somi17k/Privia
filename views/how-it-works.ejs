@@ -1,0 +1,116 @@
+<section class="premium-panel p-4 p-lg-5 mb-4 reveal-on-scroll">
+  <span class="section-kicker">How It Works</span>
+  <h1 class="display-6 fw-bold mb-3">From onboarding to live verification in 4 steps</h1>
+  <p class="lead text-white-50 mb-0">
+    Privia keeps the journey simple: register securely, get verified, generate temporary proof, and pass trust checks instantly.
+  </p>
+</section>
+
+<section class="row g-4 mb-4">
+  <div class="col-md-6 col-xl-3">
+    <div class="surface-card flow-card p-4 h-100 reveal-on-scroll">
+      <span class="flow-index">01</span>
+      <i class="bi bi-person-plus-fill fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Register</h5>
+      <p class="text-muted mb-0">Create account and submit identity proof for trusted onboarding.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="surface-card flow-card p-4 h-100 reveal-on-scroll">
+      <span class="flow-index">02</span>
+      <i class="bi bi-check2-circle fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Claim Verification</h5>
+      <p class="text-muted mb-0">Admin verifies your claim to activate verification privileges.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="surface-card flow-card p-4 h-100 reveal-on-scroll">
+      <span class="flow-index">03</span>
+      <i class="bi bi-shield-lock-fill fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Generate Proof</h5>
+      <p class="text-muted mb-0">A short-lived proof code and QR are generated from your dashboard.</p>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="surface-card flow-card p-4 h-100 reveal-on-scroll">
+      <span class="flow-index">04</span>
+      <i class="bi bi-qr-code-scan fs-2 text-primary"></i>
+      <h5 class="fw-bold mt-2">Live Verify</h5>
+      <p class="text-muted mb-0">Scanner validates code, expiry, and verified user state in real time.</p>
+    </div>
+  </div>
+</section>
+
+<section class="surface-card p-4 p-lg-5 reveal-on-scroll">
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <h3 class="fw-bold mb-3">Verification outcome logic</h3>
+      <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+        <li><i class="bi bi-check-circle-fill text-success me-2"></i>Valid code + not expired + verified user = accepted</li>
+        <li><i class="bi bi-x-circle-fill text-danger me-2"></i>Missing/invalid code = rejected</li>
+        <li><i class="bi bi-clock-history text-warning me-2"></i>Expired proof = rejected with expiry reason</li>
+        <li><i class="bi bi-person-x-fill text-secondary me-2"></i>Unverified user = rejected with status reason</li>
+      </ul>
+    </div>
+    <div class="col-lg-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Why this matters</h6>
+        <p class="text-muted mb-0">
+          This flow offers a strong balance: real trust decisions for verifiers and minimized data exposure for users.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .premium-panel {
+    background:
+      linear-gradient(120deg, rgba(9, 20, 40, 0.82), rgba(15, 33, 62, 0.72)),
+      url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    color: #ecf3ff;
+    border-radius: 1rem;
+    border: 1px solid rgba(150, 183, 243, 0.24);
+    box-shadow: 0 18px 34px rgba(5, 12, 26, 0.45);
+  }
+
+  .section-kicker {
+    display: inline-block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(172, 198, 250, 0.35);
+    color: #d6e5ff;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .flow-card {
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .flow-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.85rem 1.4rem rgba(13, 110, 253, 0.12);
+  }
+
+  .flow-index {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.9rem;
+    font-weight: 700;
+    font-size: 0.78rem;
+    color: #a4b5d8;
+    letter-spacing: 0.08em;
+  }
+
+  .mini-feature {
+    border: 1px solid rgba(150, 183, 243, 0.22);
+    border-radius: 0.85rem;
+    padding: 1rem;
+    background: rgba(11, 25, 47, 0.74);
+  }
+</style>

@@ -3,50 +3,82 @@ const router = express.Router();
 const crypto = require('crypto');
 const User = require('../models/User');
 const Proof = require('../models/Proof');
+const PROOF_TTL_MS = 30 * 1000;
 
-router.post('/proof', async (req, res) => {
+function ensureAuth(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  return res.status(401).json({ valid: false, reason: 'unauthorized' });
+}
+
+router.post('/proof', ensureAuth, async (req, res) => {
   try {
-    const { userId, claimType } = req.body;
+    const claimType = typeof req.body?.claimType === 'string' && req.body.claimType.trim()
+      ? req.body.claimType.trim()
+      : 'email_verified';
+    const shouldRegenerate = req.body?.regenerate === true || req.body?.regenerate === '1' || req.body?.regenerate === 'true';
 
-    if (!userId || !claimType) {
-      return res.status(400).json({ valid: false });
-    }
-
-    const user = await User.findById(userId).lean();
+    const user = await User.findById(req.user.id).lean();
     if (!user) {
-      return res.status(404).json({ valid: false });
+      return res.status(404).json({ valid: false, reason: 'user not found' });
     }
 
     const claims = Array.isArray(user.claims) ? user.claims : [];
     const claim = claims.find(c => c.type === claimType && c.verified);
 
     if (!claim) {
-      return res.json({ valid: false });
+      return res.status(403).json({ valid: false, reason: 'claim not verified' });
     }
 
-    const issuedAt = new Date();
-    const expiresAt = new Date(issuedAt.getTime() + 30 * 1000); // 30 seconds
-    const nonce = crypto.randomBytes(16).toString('hex');
+    if (!user.verified) {
+      return res.status(403).json({ valid: false, reason: 'user not approved' });
+    }
 
-    const proof = {
-      userId,
-      claimType,
+    if (!shouldRegenerate) {
+      const existingProof = await Proof.findOne({
+        userId: user._id,
+        expiresAt: { $gt: new Date() }
+      }).sort({ expiresAt: -1 }).lean();
+
+      if (existingProof) {
+        const expiresAtIso = new Date(existingProof.expiresAt).toISOString();
+        return res.json({
+          valid: true,
+          code: existingProof.code,
+          expiresAt: expiresAtIso,
+          proof: {
+            code: existingProof.code,
+            claimType,
+            expiresAt: expiresAtIso
+          }
+        });
+      }
+    }
+
+    const code = `PRIVIA-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    const expiresAt = new Date(Date.now() + PROOF_TTL_MS);
+
+    await Proof.deleteMany({ userId: user._id });
+    await Proof.create({
+      code,
+      userId: user._id,
+      expiresAt
+    });
+
+    const expiresAtIso = expiresAt.toISOString();
+    return res.json({
       valid: true,
-      issuedAt: issuedAt.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-      nonce
-    };
-
-    const signature = crypto
-      .createHmac('sha256', process.env.PROOF_SECRET)
-      .update(JSON.stringify(proof))
-      .digest('hex');
-
-    res.json({ proof, signature });
+      code,
+      expiresAt: expiresAtIso,
+      proof: {
+        code,
+        claimType,
+        expiresAt: expiresAtIso
+      }
+    });
 
   } catch (err) {
     console.error('Proof API error:', err);
-    res.status(500).json({ valid: false });
+    res.status(500).json({ valid: false, reason: 'server error' });
   }
 });
 
@@ -59,25 +91,27 @@ router.post('/verify-proof', async (req, res) => {
       return res.json({ valid: false });
     }
 
-    const proof = await Proof.findOne({ code });
-    if (!proof) {
+    const proof = await Proof.findOne({ code }).populate('userId');
+    if (!proof || !proof.userId) {
       return res.json({ valid: false });
     }
 
-    if (new Date() > new Date(proof.expiresAt)) {
+    const expiresAt = new Date(proof.expiresAt);
+    if (new Date() > expiresAt) {
       await Proof.deleteOne({ _id: proof._id });
       return res.json({ valid: false, reason: 'expired' });
     }
 
-    const user = await User.findById(proof.userId).lean();
-    if (!user || !user.verified) {
-      return res.json({ valid: false, reason: 'user not verified' });
+    if (!proof.userId.verified) {
+      return res.json({ valid: false, reason: 'user not approved' });
     }
+
+    await Proof.deleteOne({ _id: proof._id });
 
     return res.json({
       valid: true,
       user: {
-        name: user.name
+        name: proof.userId.name
       }
     });
   } catch (err) {

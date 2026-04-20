@@ -1,0 +1,31 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0A1A36"/>
+      <stop offset="55%" stop-color="#122B54"/>
+      <stop offset="100%" stop-color="#1B3E74"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(420 180) rotate(25) scale(520 360)">
+      <stop stop-color="#4A8CFF" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#4A8CFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1480 300) rotate(-12) scale(620 360)">
+      <stop stop-color="#915BFF" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#915BFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <rect width="1920" height="1080" fill="url(#glow1)"/>
+  <rect width="1920" height="1080" fill="url(#glow2)"/>
+
+  <g opacity="0.24">
+    <path d="M0 780L420 600L980 880L1420 640L1920 840V1080H0V780Z" fill="#0B1220"/>
+    <path d="M0 840L380 700L980 980L1460 720L1920 900V1080H0V840Z" fill="#0F1D38"/>
+  </g>
+
+  <g opacity="0.22" stroke="#9FC3FF">
+    <line x1="180" y1="0" x2="620" y2="1080"/>
+    <line x1="760" y1="0" x2="1080" y2="1080"/>
+    <line x1="1320" y1="0" x2="1700" y2="1080"/>
+  </g>
+</svg>

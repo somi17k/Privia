@@ -1,0 +1,104 @@
+<section class="premium-panel p-4 p-lg-5 mb-4 reveal-on-scroll">
+  <span class="section-kicker">Security Model</span>
+  <h1 class="display-6 fw-bold mb-3">Built for privacy-first verification, not data collection</h1>
+  <p class="lead text-white-50 mb-0">
+    Privia secures identity lifecycle with encryption, claim integrity checks, short proof TTL, and explicit verification decisions.
+  </p>
+</section>
+
+<section class="row g-4 mb-4">
+  <div class="col-md-6">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <h5 class="fw-bold mb-3"><i class="bi bi-lock-fill text-primary me-2"></i>Encrypted identity storage</h5>
+      <p class="text-muted mb-0">
+        Sensitive fields are encrypted at rest to reduce leakage risk while preserving required app functionality.
+      </p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <h5 class="fw-bold mb-3"><i class="bi bi-hash text-primary me-2"></i>Claim integrity via hashing</h5>
+      <p class="text-muted mb-0">
+        Claim-level hashing supports verifiable claim integrity without requiring raw personal data exposure.
+      </p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary me-2"></i>30-second proof validity</h5>
+      <p class="text-muted mb-0">
+        Proofs expire quickly to limit replay windows and enforce time-bounded verification.
+      </p>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="surface-card p-4 h-100 reveal-on-scroll">
+      <h5 class="fw-bold mb-3"><i class="bi bi-person-check-fill text-primary me-2"></i>Verified-user gate</h5>
+      <p class="text-muted mb-0">
+        Proof validation only succeeds when the linked user has completed verification.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="surface-card p-4 p-lg-5 reveal-on-scroll">
+  <h3 class="fw-bold mb-3">Operational safeguards</h3>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Single-use proof consumption</h6>
+        <p class="text-muted mb-0">Valid proofs are removed after successful verification to prevent re-use.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Expired proof cleanup</h6>
+        <p class="text-muted mb-0">A background cleanup routine prunes stale proofs continuously.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Claim + user status checks</h6>
+        <p class="text-muted mb-0">Backend verifies proof existence, expiry, and user verification state.</p>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mini-feature h-100">
+        <h6 class="fw-bold">Role-based admin control</h6>
+        <p class="text-muted mb-0">Administrative approval flows stay separated from normal user paths.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .premium-panel {
+    background:
+      linear-gradient(120deg, rgba(9, 20, 40, 0.82), rgba(15, 33, 62, 0.72)),
+      url('https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    color: #ecf3ff;
+    border-radius: 1rem;
+    border: 1px solid rgba(150, 183, 243, 0.24);
+    box-shadow: 0 18px 34px rgba(5, 12, 26, 0.45);
+  }
+
+  .section-kicker {
+    display: inline-block;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(172, 198, 250, 0.35);
+    color: #d6e5ff;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .mini-feature {
+    border: 1px solid rgba(150, 183, 243, 0.22);
+    border-radius: 0.85rem;
+    padding: 1rem;
+    background: rgba(11, 25, 47, 0.74);
+  }
+</style>

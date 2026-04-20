@@ -1,41 +1,43 @@
 <div class="container py-4 py-lg-5">
-  <div class="card border-0 shadow-lg mb-4 admin-hero">
+  <div class="card border-0 shadow-lg mb-4 admin-hero reveal-on-scroll">
     <div class="card-body p-4 p-lg-5">
       <h1 class="fw-bold mb-1">Admin Dashboard</h1>
       <p class="text-muted mb-0">Review identity submissions, approve users, and verify claims.</p>
     </div>
   </div>
 
-  <% const totalUsers = users.length; %>
-  <% const approvedUsers = users.filter(u => u.verified).length; %>
-  <% const pendingUsers = totalUsers - approvedUsers; %>
-  <% const pendingClaims = users.filter(u => !(u.claims?.find(c => c.type === 'email_verified')?.verified)).length; %>
-
   <div class="row g-3 mb-4">
     <div class="col-md-3">
-      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Total Users</p><h4 class="mb-0"><%= totalUsers %></h4></div></div>
+      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Total Users</p><h4 class="mb-0"><%= stats.totalUsers %></h4></div></div>
     </div>
     <div class="col-md-3">
-      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Approved</p><h4 class="mb-0 text-success"><%= approvedUsers %></h4></div></div>
+      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Approved</p><h4 class="mb-0 text-success"><%= stats.approvedUsers %></h4></div></div>
     </div>
     <div class="col-md-3">
-      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Pending Approval</p><h4 class="mb-0 text-warning"><%= pendingUsers %></h4></div></div>
+      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Pending Approval</p><h4 class="mb-0 text-warning"><%= stats.pendingUsers %></h4></div></div>
     </div>
     <div class="col-md-3">
-      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Pending Claims</p><h4 class="mb-0 text-primary"><%= pendingClaims %></h4></div></div>
+      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Pending Claims</p><h4 class="mb-0 text-primary"><%= stats.pendingClaims %></h4></div></div>
     </div>
   </div>
 
-  <div class="card shadow-lg border-0 rounded-4">
+  <div class="card shadow-lg border-0 rounded-4 reveal-on-scroll">
     <div class="card-body p-4">
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
         <h4 class="fw-semibold text-primary mb-0">Registered Users</h4>
-        <input type="text" id="user-search" class="form-control" style="max-width: 260px;" placeholder="Search by name">
+        <form action="/admin" method="GET" class="d-flex gap-2">
+          <select class="form-select" name="status">
+            <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All</option>
+            <option value="approved" <%= filters.status === 'approved' ? 'selected' : '' %>>Approved</option>
+            <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+          </select>
+          <button type="submit" class="btn btn-outline-primary">Apply</button>
+        </form>
       </div>
 
       <% if (users && users.length > 0) { %>
         <div class="table-responsive">
-          <table class="table table-hover align-middle" id="users-table">
+          <table class="table table-hover align-middle">
             <thead class="text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
               <tr>
                 <th>Name</th>
@@ -50,7 +52,7 @@
                 <% const emailClaim = user.claims?.find(c => c.type === 'email_verified'); %>
                 <% const proofExt = user.idProof ? user.idProof.split('.').pop().toLowerCase() : ''; %>
                 <% const isImageProof = ['jpg','jpeg','png','webp'].includes(proofExt); %>
-                <tr data-name="<%= user.name.toLowerCase() %>">
+                <tr>
                   <td class="fw-semibold">
                     <%= user.name %>
                     <% if (user.verified) { %>
@@ -112,33 +114,43 @@
             </tbody>
           </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <small class="text-muted">Page <%= pagination.page %> of <%= pagination.totalPages %></small>
+          <div class="d-flex gap-2">
+            <% if (pagination.hasPrev) { %>
+              <a class="btn btn-sm btn-outline-primary" href="/admin?status=<%= filters.status %>&page=<%= pagination.page - 1 %>">Previous</a>
+            <% } %>
+            <% if (pagination.hasNext) { %>
+              <a class="btn btn-sm btn-outline-primary" href="/admin?status=<%= filters.status %>&page=<%= pagination.page + 1 %>">Next</a>
+            <% } %>
+          </div>
+        </div>
       <% } else { %>
         <div class="alert alert-info mb-0">No users found yet.</div>
       <% } %>
     </div>
   </div>
+
+  <div class="surface-card p-4 mt-4 reveal-on-scroll">
+    <h5 class="fw-bold mb-2">Admin Knowledge Center</h5>
+    <p class="text-muted mb-3">Keep policies and verification team aligned with platform behavior.</p>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-primary" href="/how-it-works"><i class="bi bi-diagram-3 me-1"></i>Review Flow</a>
+      <a class="btn btn-outline-primary" href="/security"><i class="bi bi-shield-lock me-1"></i>Security Model</a>
+      <a class="btn btn-outline-primary" href="/about"><i class="bi bi-info-circle me-1"></i>Platform Overview</a>
+    </div>
+  </div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const input = document.getElementById("user-search");
-    const rows = document.querySelectorAll("#users-table tbody tr");
-    if (!input || !rows.length) return;
-
-    input.addEventListener("input", () => {
-      const query = input.value.trim().toLowerCase();
-      rows.forEach((row) => {
-        const name = row.getAttribute("data-name") || "";
-        row.style.display = name.includes(query) ? "" : "none";
-      });
-    });
-  });
-</script>
 
 <style>
   .admin-hero {
-    background: radial-gradient(circle at top right, rgba(102, 16, 242, 0.12), transparent 45%),
-      radial-gradient(circle at top left, rgba(13, 110, 253, 0.12), transparent 45%),
-      #fff;
+    background:
+      linear-gradient(120deg, rgba(12, 25, 46, 0.52), rgba(28, 45, 74, 0.38)),
+      url('https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+    color: #fff;
+  }
+
+  .admin-hero .text-muted {
+    color: rgba(226, 236, 255, 0.9) !important;
   }
 </style>
