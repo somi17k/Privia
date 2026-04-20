@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privia | <%- typeof title !=='undefined' ? title : 'Privacy-Preserving ID' %></title>
+
+  <!-- ✅ Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- ✅ Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --privia-primary: #0d6efd;
+      --privia-secondary: #6610f2;
+      --privia-text: #1d2433;
+      --privia-muted: #5f6b7a;
+      --privia-surface: #ffffff;
+      --privia-bg: #f3f6fc;
+      --privia-gradient: linear-gradient(90deg, #0d6efd, #6610f2);
+      --privia-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: var(--privia-text);
+      background:
+        radial-gradient(circle at 12% -8%, rgba(13, 110, 253, 0.16), transparent 30%),
+        radial-gradient(circle at 88% 0%, rgba(102, 16, 242, 0.16), transparent 28%),
+        var(--privia-bg);
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(13, 110, 253, 0.12);
+      box-shadow: 0 8px 20px rgba(31, 41, 55, 0.06);
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: var(--privia-text) !important;
+      font-weight: 600;
+    }
+
+    .nav-link {
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem !important;
+      transition: all 0.2s ease;
+    }
+
+    .navbar-brand:hover,
+    .nav-link:hover {
+      color: var(--privia-primary) !important;
+      opacity: 1;
+      background: rgba(13, 110, 253, 0.08);
+    }
+
+    .content-wrapper {
+      min-height: calc(100vh - 190px);
+      padding: 2.25rem 0;
+    }
+
+    footer {
+      background: var(--privia-surface);
+      color: var(--privia-muted);
+      border-top: 1px solid rgba(13, 110, 253, 0.1);
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 2rem;
+    }
+
+    .top-note {
+      color: var(--privia-muted);
+      border-bottom: 1px solid rgba(13, 110, 253, 0.08);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 700;
+      letter-spacing: 0.25px;
+    }
+
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--privia-gradient);
+      box-shadow: 0 0 0 5px rgba(13, 110, 253, 0.1);
+    }
+
+    .btn-privia {
+      background: var(--privia-gradient);
+      border: none;
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 8px 16px rgba(13, 110, 253, 0.22);
+    }
+
+    .btn-privia:hover,
+    .btn-privia:focus {
+      background: var(--privia-gradient);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(13, 110, 253, 0.28);
+    }
+
+    .surface-card {
+      background: var(--privia-surface);
+      border: 1px solid rgba(13, 110, 253, 0.08);
+      box-shadow: var(--privia-shadow);
+      border-radius: 1rem;
+    }
+
+    /* ✅ Toast Animation */
+    .toast {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      animation: slideIn 0.5s ease forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ✅ Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+      <a class="navbar-brand brand-pill" href="/">
+        <span class="brand-dot"></span>
+        <span>Privia</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navmenu">
+        <ul class="navbar-nav ms-auto">
+          <% if (currentPath !== '/') { %>
+            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+            <% } %>
+          <% if (typeof user !=='undefined' && user) { %>
+            <% if (currentPath !== '/dashboard') { %>
+              <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+              <% } %>
+            <% if (user && user.role==='admin' && currentPath !== '/admin') { %>
+              <li class="nav-item"><a class="nav-link" href="/admin">Admin Dashboard</a></li>
+              <% } %>
+                <li class="nav-item"><a class="nav-link" href="/users/logout">Logout</a></li>
+                <% } else { %>
+                  <% if (currentPath !== '/users/login') { %>
+                    <li class="nav-item"><a class="nav-link" href="/users/login">Login</a></li>
+                    <% } %>
+                      <% if (currentPath !== '/users/register') { %>
+                        <li class="nav-item"><a class="nav-link" href="/users/register">Register</a></li>
+                        <% } %>
+                  <% } %>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="text-center small py-2 top-note">
+    Privia never stores or shares your identity — only cryptographic proofs are used.
+  </div>
+
+  <!-- ✅ Toast Container -->
+  <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+    <%- include('./partials/messages') %>
+  </div>
+
+  <!-- ✅ Page Content -->
+  <div class="container content-wrapper">
+    <%- typeof body !=='undefined' ? body : '' %>
+  </div>
+
+  <!-- ✅ Footer -->
+  <footer>
+    <p>© <%= new Date().getFullYear() %> Privia | Privacy-Preserving Identity Verification</p>
+  </footer>
+
+  <!-- ✅ Bootstrap Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ✅ Initialize Toasts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const toastElList = document.querySelectorAll('.toast');
+      toastElList.forEach(toastEl => {
+        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        toast.show();
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        new bootstrap.Tooltip(el);
+      });
+    });
+  </script>
+</body>
+
+</html>

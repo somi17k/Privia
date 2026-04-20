@@ -1,0 +1,144 @@
+<div class="container py-4 py-lg-5">
+  <div class="card border-0 shadow-lg mb-4 admin-hero">
+    <div class="card-body p-4 p-lg-5">
+      <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+      <p class="text-muted mb-0">Review identity submissions, approve users, and verify claims.</p>
+    </div>
+  </div>
+
+  <% const totalUsers = users.length; %>
+  <% const approvedUsers = users.filter(u => u.verified).length; %>
+  <% const pendingUsers = totalUsers - approvedUsers; %>
+  <% const pendingClaims = users.filter(u => !(u.claims?.find(c => c.type === 'email_verified')?.verified)).length; %>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Total Users</p><h4 class="mb-0"><%= totalUsers %></h4></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Approved</p><h4 class="mb-0 text-success"><%= approvedUsers %></h4></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Pending Approval</p><h4 class="mb-0 text-warning"><%= pendingUsers %></h4></div></div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm h-100"><div class="card-body"><p class="text-muted mb-1">Pending Claims</p><h4 class="mb-0 text-primary"><%= pendingClaims %></h4></div></div>
+    </div>
+  </div>
+
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h4 class="fw-semibold text-primary mb-0">Registered Users</h4>
+        <input type="text" id="user-search" class="form-control" style="max-width: 260px;" placeholder="Search by name">
+      </div>
+
+      <% if (users && users.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle" id="users-table">
+            <thead class="text-white" style="background: linear-gradient(90deg, #0d6efd, #6610f2);">
+              <tr>
+                <th>Name</th>
+                <th>ID Proof</th>
+                <th>Claim Status</th>
+                <th>User Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% users.forEach((user)=> { %>
+                <% const emailClaim = user.claims?.find(c => c.type === 'email_verified'); %>
+                <% const proofExt = user.idProof ? user.idProof.split('.').pop().toLowerCase() : ''; %>
+                <% const isImageProof = ['jpg','jpeg','png','webp'].includes(proofExt); %>
+                <tr data-name="<%= user.name.toLowerCase() %>">
+                  <td class="fw-semibold">
+                    <%= user.name %>
+                    <% if (user.verified) { %>
+                      <span class="badge bg-success ms-2">Approved</span>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <% if (user.idProof) { %>
+                      <a href="/uploads/<%= user.idProof %>" target="_blank" class="text-decoration-none">
+                        <% if (isImageProof) { %>
+                          <img src="/uploads/<%= user.idProof %>" width="64" height="64" class="rounded shadow-sm object-fit-cover" alt="ID Proof">
+                        <% } else { %>
+                          <span class="btn btn-sm btn-outline-secondary">View PDF</span>
+                        <% } %>
+                      </a>
+                    <% } else { %>
+                      <span class="text-muted">No proof</span>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <% if (emailClaim && emailClaim.verified) { %>
+                      <span class="badge bg-success">Verified</span>
+                    <% } else { %>
+                      <span class="badge bg-warning text-dark">Pending</span>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <% if (user.verified) { %>
+                      <span class="badge bg-success">Approved</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary">Unapproved</span>
+                    <% } %>
+                  </td>
+
+                  <td>
+                    <div class="d-flex flex-column gap-2">
+                      <% if (!user.verified) { %>
+                        <form action="/admin/approve-user/<%= user._id %>" method="POST">
+                          <button type="submit" class="btn btn-sm btn-primary w-100">Approve User</button>
+                        </form>
+                      <% } %>
+
+                      <% if (emailClaim && !emailClaim.verified) { %>
+                        <form action="/admin/verify/<%= user._id %>/email_verified" method="POST">
+                          <button type="submit" class="btn btn-sm btn-success w-100">Verify Claim</button>
+                        </form>
+                      <% } %>
+
+                      <% if (user.verified && (!emailClaim || emailClaim.verified)) { %>
+                        <span class="text-muted small">No pending action</span>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="alert alert-info mb-0">No users found yet.</div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("user-search");
+    const rows = document.querySelectorAll("#users-table tbody tr");
+    if (!input || !rows.length) return;
+
+    input.addEventListener("input", () => {
+      const query = input.value.trim().toLowerCase();
+      rows.forEach((row) => {
+        const name = row.getAttribute("data-name") || "";
+        row.style.display = name.includes(query) ? "" : "none";
+      });
+    });
+  });
+</script>
+
+<style>
+  .admin-hero {
+    background: radial-gradient(circle at top right, rgba(102, 16, 242, 0.12), transparent 45%),
+      radial-gradient(circle at top left, rgba(13, 110, 253, 0.12), transparent 45%),
+      #fff;
+  }
+</style>

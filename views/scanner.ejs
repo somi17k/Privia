@@ -1,0 +1,123 @@
+<div class="row justify-content-center py-4 py-md-5">
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-lg rounded-4">
+      <div class="card-body p-4 p-md-5 text-center">
+        <h2 class="fw-bold mb-2">Privia Scanner</h2>
+        <p class="text-muted mb-4">Scan a temporary proof QR and verify claim validity instantly.</p>
+
+        <div class="scanner-frame mx-auto mb-3">
+          <div id="reader"></div>
+        </div>
+
+        <div id="result" class="alert alert-secondary mb-3">Ready to scan</div>
+
+        <button id="restart-scan" type="button" class="btn btn-outline-primary d-none">
+          Scan Another Proof
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+  const resultBox = document.getElementById("result");
+  const restartBtn = document.getElementById("restart-scan");
+  const html5QrCode = new Html5Qrcode("reader");
+  let selectedCameraId = null;
+  let scanActive = false;
+
+  function setResult(type, message) {
+    resultBox.className = `alert mb-3 alert-${type}`;
+    resultBox.textContent = message;
+  }
+
+  async function startScanner() {
+    if (!selectedCameraId || scanActive) return;
+    await html5QrCode.start(
+      selectedCameraId,
+      { fps: 10, qrbox: 250 },
+      onScanSuccess
+    );
+    scanActive = true;
+    restartBtn.classList.add("d-none");
+    setResult("secondary", "Ready to scan");
+  }
+
+  async function onScanSuccess(decodedText) {
+    setResult("secondary", "Verifying proof...");
+
+    try {
+      const scannedValue = String(decodedText || "").trim();
+      if (!scannedValue) {
+        setResult("warning", "Invalid QR data");
+        return;
+      }
+
+      let endpoint = "/verify/proof";
+      let payload = { code: scannedValue };
+
+      try {
+        const parsed = JSON.parse(scannedValue);
+        if (parsed && typeof parsed.code === "string") {
+          payload = { code: parsed.code };
+        } else {
+          endpoint = "/verify";
+          payload = parsed;
+        }
+      } catch {
+        payload = { code: scannedValue };
+      }
+
+      await html5QrCode.stop();
+      scanActive = false;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.valid) {
+        setResult("success", "Identity verified");
+      } else {
+        setResult("danger", "Invalid or expired proof");
+      }
+      restartBtn.classList.remove("d-none");
+    } catch (err) {
+      setResult("danger", "Verification failed");
+      restartBtn.classList.remove("d-none");
+    }
+  }
+
+  Html5Qrcode.getCameras().then(async (devices) => {
+    if (!devices || !devices.length) {
+      setResult("danger", "No camera found");
+      return;
+    }
+
+    selectedCameraId = devices.length > 1 ? devices[1].id : devices[0].id;
+    await startScanner();
+  }).catch(() => {
+    setResult("danger", "Camera access failed");
+  });
+
+  restartBtn.addEventListener("click", async () => {
+    try {
+      await startScanner();
+    } catch {
+      setResult("danger", "Could not restart scanner");
+    }
+  });
+</script>
+
+<style>
+  .scanner-frame {
+    max-width: 360px;
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+    background: #fff;
+    padding: 12px;
+  }
+</style>

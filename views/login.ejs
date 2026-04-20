@@ -1,0 +1,52 @@
+<div class="row justify-content-center align-items-center py-4 py-md-5">
+  <div class="col-12 col-xl-10">
+    <div class="surface-card overflow-hidden">
+      <div class="row g-0">
+        <div class="col-lg-5 d-none d-lg-block login-side p-5">
+          <span class="badge rounded-pill text-bg-light text-primary mb-3">Privia Access</span>
+          <h3 class="fw-bold text-white mb-3">Secure login for verified identity workflows</h3>
+          <p class="text-white-50 mb-4">Access your encrypted claims and generate temporary proofs when you need verification.</p>
+          <div class="small text-white-50 d-flex flex-column gap-2">
+            <span><i class="bi bi-shield-lock me-2"></i>Encrypted identity data</span>
+            <span><i class="bi bi-key me-2"></i>Claim-based trust model</span>
+            <span><i class="bi bi-qr-code-scan me-2"></i>Time-limited QR proofs</span>
+          </div>
+        </div>
+
+        <div class="col-lg-7 p-4 p-md-5">
+          <div class="mb-4">
+            <h2 class="fw-bold mb-1">Welcome back</h2>
+            <p class="text-muted mb-0">Login to continue to your Privia dashboard.</p>
+          </div>
+
+          <form action="/users/login" method="POST">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email</label>
+              <input type="email" name="email" class="form-control form-control-lg" placeholder="you@example.com" required>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Password</label>
+              <input type="password" name="password" class="form-control form-control-lg" placeholder="Enter your password" required>
+            </div>
+
+            <button class="btn btn-privia btn-lg w-100" type="submit">
+              Login
+            </button>
+          </form>
+
+          <p class="text-center mt-4 mb-0">
+            Don’t have an account?
+            <a href="/users/register" class="fw-semibold">Register</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .login-side {
+    background: linear-gradient(90deg, #0d6efd, #6610f2);
+  }
+</style>

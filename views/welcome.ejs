@@ -1,0 +1,217 @@
+<div class="container py-4 py-lg-5">
+  <section class="surface-card welcome-hero p-4 p-lg-5 mb-4 mb-lg-5 position-relative overflow-hidden">
+    <div class="welcome-blur welcome-blur-1"></div>
+    <div class="welcome-blur welcome-blur-2"></div>
+
+    <div class="row g-4 align-items-center position-relative">
+      <div class="col-lg-7">
+        <span class="badge rounded-pill text-bg-light text-primary fw-semibold px-3 py-2 mb-3">
+          Privacy-first identity verification
+        </span>
+        <h1 class="display-4 fw-bold lh-sm mb-3">
+          Prove identity with
+          <span class="welcome-gradient-text d-inline-block">zero unnecessary exposure</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+          Privia combines encrypted identity storage, claim-based validation, and temporary proof sharing
+          to help users verify trust without revealing sensitive data.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <% if (!user) { %>
+            <a href="/users/register" class="btn btn-lg btn-privia px-4">Start Securely</a>
+            <a href="/users/login" class="btn btn-lg btn-outline-primary px-4">Login</a>
+            <% } else { %>
+              <a href="/dashboard" class="btn btn-lg btn-privia px-4">Open Dashboard</a>
+              <% } %>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="surface-card p-4 h-100 welcome-stats-panel">
+          <h5 class="fw-bold mb-3">Security Snapshot</h5>
+          <div class="d-flex justify-content-between align-items-center rounded-3 px-3 py-2 mb-2 welcome-stat-row">
+            <span class="text-muted">Email Encryption</span>
+            <span class="badge text-bg-success">AES</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center rounded-3 px-3 py-2 mb-2 welcome-stat-row">
+            <span class="text-muted">Claim Integrity</span>
+            <span class="badge text-bg-primary">SHA-256</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center rounded-3 px-3 py-2 mb-2 welcome-stat-row">
+            <span class="text-muted">Proof Expiry</span>
+            <span class="badge text-bg-info text-dark">15 seconds</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center rounded-3 px-3 py-2 welcome-stat-row">
+            <span class="text-muted">Verification Flow</span>
+            <span class="badge text-bg-secondary">Admin + Claims</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row g-3 mb-4 mb-lg-5">
+    <div class="col-6 col-lg-3">
+      <div class="surface-card p-3 h-100 text-center">
+        <h5 class="fw-bold text-primary mb-1">Encrypted</h5>
+        <p class="small text-muted mb-0">Identity data at rest</p>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="surface-card p-3 h-100 text-center">
+        <h5 class="fw-bold text-primary mb-1">Claim-Based</h5>
+        <p class="small text-muted mb-0">Verification without oversharing</p>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="surface-card p-3 h-100 text-center">
+        <h5 class="fw-bold text-primary mb-1">Short-lived</h5>
+        <p class="small text-muted mb-0">QR/code proofs expire quickly</p>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="surface-card p-3 h-100 text-center">
+        <h5 class="fw-bold text-primary mb-1">Auditable</h5>
+        <p class="small text-muted mb-0">Admin review workflow</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface-card p-4 p-lg-5 mb-4 mb-lg-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <div>
+        <h2 class="fw-bold mb-1">How Privia Works</h2>
+        <p class="text-muted mb-0">Three simple steps from onboarding to proof sharing.</p>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="welcome-step-card p-3 h-100 rounded-4">
+          <span class="welcome-step-index">01</span>
+          <i class="bi bi-person-vcard fs-2 text-primary d-block mb-2"></i>
+          <h5 class="fw-bold">Secure Registration</h5>
+          <p class="text-muted mb-0">Create an account and upload your identity proof. Sensitive data remains encrypted.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="welcome-step-card p-3 h-100 rounded-4">
+          <span class="welcome-step-index">02</span>
+          <i class="bi bi-patch-check fs-2 text-primary d-block mb-2"></i>
+          <h5 class="fw-bold">Claim Verification</h5>
+          <p class="text-muted mb-0">Admin verifies your claim so the platform can validate trust without leaking identity details.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="welcome-step-card p-3 h-100 rounded-4">
+          <span class="welcome-step-index">03</span>
+          <i class="bi bi-qr-code-scan fs-2 text-primary d-block mb-2"></i>
+          <h5 class="fw-bold">Temporary Proof Sharing</h5>
+          <p class="text-muted mb-0">Generate a short-lived code and QR only when needed for live verification checks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row g-4 mb-4 mb-lg-5">
+    <div class="col-lg-6">
+      <div class="surface-card p-4 h-100">
+        <h4 class="fw-bold mb-3">Built for privacy-sensitive use cases</h4>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+          <li><i class="bi bi-check-circle-fill text-success me-2"></i>Campus and enterprise access checks</li>
+          <li><i class="bi bi-check-circle-fill text-success me-2"></i>KYC-lite flows for platform onboarding</li>
+          <li><i class="bi bi-check-circle-fill text-success me-2"></i>Minimal-data identity attestation</li>
+          <li><i class="bi bi-check-circle-fill text-success me-2"></i>Time-bound verification events</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="surface-card p-4 h-100">
+        <h4 class="fw-bold mb-3">Why this approach matters</h4>
+        <p class="text-muted mb-0">
+          Traditional systems collect and expose too much personal information. Privia keeps verification focused on
+          trusted claims and temporary proofs so users stay in control of what is revealed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="surface-card p-4 p-lg-5 text-center welcome-cta">
+    <h2 class="fw-bold mb-2">Trust should be provable, not invasive.</h2>
+    <p class="text-muted mb-4">Bring secure, privacy-preserving identity verification into your workflow today.</p>
+    <% if (!user) { %>
+      <a href="/users/register" class="btn btn-lg btn-privia px-4">Create Your Privia Account</a>
+      <% } else { %>
+        <a href="/dashboard" class="btn btn-lg btn-privia px-4">Go to Dashboard</a>
+        <% } %>
+  </section>
+</div>
+
+<style>
+  .welcome-hero {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.06), rgba(102, 16, 242, 0.08));
+    border: 1px solid rgba(13, 110, 253, 0.15);
+  }
+
+  .welcome-blur {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(50px);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .welcome-blur-1 {
+    width: 180px;
+    height: 180px;
+    right: -50px;
+    top: -40px;
+    background: rgba(102, 16, 242, 0.4);
+  }
+
+  .welcome-blur-2 {
+    width: 140px;
+    height: 140px;
+    left: -35px;
+    bottom: -40px;
+    background: rgba(13, 110, 253, 0.35);
+  }
+
+  .welcome-gradient-text {
+    background: linear-gradient(90deg, #0d6efd, #6610f2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .welcome-stat-row {
+    border: 1px solid rgba(13, 110, 253, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .welcome-step-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(13, 110, 253, 0.09);
+    background: #fff;
+    position: relative;
+  }
+
+  .welcome-step-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.25rem rgba(13, 110, 253, 0.12);
+  }
+
+  .welcome-step-index {
+    position: absolute;
+    top: 0.9rem;
+    right: 1rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6c7fa4;
+    letter-spacing: 0.08em;
+  }
+
+  .welcome-cta {
+    background: radial-gradient(circle at top, rgba(102, 16, 242, 0.08), transparent 60%), #fff;
+  }
+</style>
