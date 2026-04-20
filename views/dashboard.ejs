@@ -7,8 +7,8 @@
           <h1 class="fw-bold mb-1">Welcome, <%= user.name %></h1>
           <p class="text-muted mb-0">Manage privacy-first verification and proof sharing.</p>
         </div>
-        <span class="badge rounded-pill px-3 py-2 dashboard-status-pill <%= user.verified ? 'text-bg-success' : 'text-bg-warning text-dark' %>">
-          <%= user.verified ? 'Verified Account' : 'Verification Pending' %>
+        <span class="badge rounded-pill px-3 py-2 dashboard-status-pill <%= user.verificationStatus === 'approved' ? 'text-bg-success' : (user.verificationStatus === 'rejected' ? 'text-bg-danger' : 'text-bg-warning text-dark') %>">
+          <%= user.verificationStatus === 'approved' ? 'Verified Account' : (user.verificationStatus === 'rejected' ? 'Verification Rejected' : 'Verification Pending') %>
         </span>
       </div>
     </div>
@@ -29,7 +29,7 @@
         <div class="card-body p-4">
           <i class="bi bi-patch-check text-primary mb-2 d-inline-block"></i>
           <p class="text-muted mb-1">Email Claim</p>
-          <h4 class="mb-0 fw-bold"><%= user.verified ? 'Verified' : 'Pending' %></h4>
+          <h4 class="mb-0 fw-bold"><%= user.claimVerified ? 'Verified' : 'Pending' %></h4>
         </div>
       </div>
     </div>
@@ -78,7 +78,7 @@
     <div class="card-body p-4 p-lg-5">
       <h4 class="fw-bold text-primary mb-4">Account Overview</h4>
 
-      <% if (user.verified) { %>
+      <% if (user.verificationStatus === 'approved') { %>
         <div class="alert alert-success d-flex align-items-center gap-3 rounded-3">
           <i class="bi bi-shield-check fs-3"></i>
           <div>
@@ -86,7 +86,15 @@
             You can generate secure temporary proofs.
           </div>
         </div>
-        <% } else { %>
+      <% } else if (user.verificationStatus === 'rejected') { %>
+        <div class="alert alert-danger d-flex align-items-center gap-3 rounded-3">
+          <i class="bi bi-x-octagon fs-4"></i>
+          <div>
+            <strong>Verification rejected.</strong><br>
+            <span>Reason: <%= user.rejectionReason || 'Identity proof did not pass review.' %></span>
+          </div>
+        </div>
+      <% } else { %>
           <div class="alert alert-warning d-flex align-items-center gap-3 rounded-3">
             <i class="bi bi-hourglass-split fs-4"></i>
             <div>
@@ -94,13 +102,13 @@
               Please wait for admin approval before proof generation.
             </div>
           </div>
-          <% } %>
+      <% } %>
 
             <div class="row g-3 mt-1">
               <div class="col-md-6">
                 <div class="p-3 bg-light rounded-3 h-100">
                   <p class="text-muted mb-1">Email Claim</p>
-                  <p class="fw-semibold mb-0"><%= user.verified ? 'Verified (encrypted identity)' : 'Pending verification' %></p>
+                  <p class="fw-semibold mb-0"><%= user.claimVerified ? 'Verified (encrypted identity)' : 'Pending verification' %></p>
                 </div>
               </div>
               <div class="col-md-6">
@@ -113,7 +121,7 @@
 
             <hr class="my-4">
 
-              <% if (user.verified) { %>
+              <% if (user.verificationStatus === 'approved') { %>
                 <div class="text-center">
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                   <button class="btn btn-lg px-4 btn-privia" id="generate-proof-btn">
@@ -161,11 +169,20 @@
                   </div>
                 </div>
               </div>
+              <% } else if (user.verificationStatus === 'rejected') { %>
+                <div class="alert alert-danger text-start mt-3 mb-0">
+                  <strong>Re-submit identity proof required.</strong>
+                  <p class="mb-2 mt-1">Reason: <%= user.rejectionReason || 'Identity proof did not pass review.' %></p>
+                  <form action="/users/resubmit-proof" method="POST" enctype="multipart/form-data" class="d-flex flex-column flex-md-row gap-2">
+                    <input type="file" class="form-control" name="idProof" accept=".jpg,.jpeg,.png,.pdf" required>
+                    <button type="submit" class="btn btn-danger">Re-submit Proof</button>
+                  </form>
+                </div>
               <% } else { %>
                 <div class="alert alert-warning text-center mt-3 mb-0">
                   Your identity is not verified yet. Please wait for admin approval.
                 </div>
-                <% } %>
+              <% } %>
     </div>
   </div>
 

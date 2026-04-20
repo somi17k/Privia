@@ -6,7 +6,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const User = require('../models/User');
-const { forwardAuthenticated } = require('../config/auth');
+const { forwardAuthenticated, ensureAuthenticated } = require('../config/auth');
 const multer = require("multer");
 const path = require("path");
 // 🔵 Multer storage config
@@ -105,6 +105,8 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
       password,
       role,
       idProof: req.file ? req.file.filename : null,
+      verificationStatus: 'pending',
+      rejectionReason: null,
       claims: [emailClaim]
     });
 
@@ -129,6 +131,39 @@ router.post('/login',
     failureFlash: true
   })
 );
+
+router.post('/resubmit-proof', ensureAuthenticated, upload.single("idProof"), async (req, res) => {
+  try {
+    if (!req.file) {
+      req.flash('error_msg', 'Please upload a new identity proof');
+      return res.redirect('/dashboard');
+    }
+
+    await User.updateOne(
+      { _id: req.user.id },
+      {
+        $set: {
+          idProof: req.file.filename,
+          verified: false,
+          verificationStatus: 'pending',
+          rejectionReason: null,
+          rejectedAt: null,
+          'claims.$[emailClaim].verified': false
+        }
+      },
+      {
+        arrayFilters: [{ 'emailClaim.type': 'email_verified' }]
+      }
+    );
+
+    req.flash('success_msg', 'New proof submitted. Waiting for admin review.');
+    return res.redirect('/dashboard');
+  } catch (err) {
+    console.error('Resubmit proof error:', err);
+    req.flash('error_msg', 'Failed to submit new proof');
+    return res.redirect('/dashboard');
+  }
+});
 
 // ✅ Logout Route (Flash-safe)
 router.get('/logout', (req, res, next) => {

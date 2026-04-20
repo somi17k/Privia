@@ -75,7 +75,10 @@ router.get('/dashboard', ensureAuthenticated, (req, res) => {
     user: {
       name,
       email: emailClaim ? 'Email on file' : 'Not provided',
-      verified: emailClaim?.verified || false,
+      verified: Boolean(req.user.verified),
+      claimVerified: Boolean(emailClaim?.verified),
+      verificationStatus: req.user.verificationStatus || (req.user.verified ? 'approved' : 'pending'),
+      rejectionReason: req.user.rejectionReason || null,
       date: req.user.date,
       role: req.user.role
     }

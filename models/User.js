@@ -37,6 +37,22 @@ const UserSchema = new mongoose.Schema({
     default: false
   },
 
+  verificationStatus: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending"
+  },
+
+  rejectionReason: {
+    type: String,
+    default: null
+  },
+
+  rejectedAt: {
+    type: Date,
+    default: null
+  },
+
   claims: [
     {
       type: {

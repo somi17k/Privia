@@ -17,7 +17,7 @@
       <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Pending Approval</p><h4 class="mb-0 text-warning"><%= stats.pendingUsers %></h4></div></div>
     </div>
     <div class="col-md-3">
-      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Pending Claims</p><h4 class="mb-0 text-primary"><%= stats.pendingClaims %></h4></div></div>
+      <div class="card border-0 shadow-sm h-100 reveal-on-scroll"><div class="card-body"><p class="text-muted mb-1">Rejected</p><h4 class="mb-0 text-danger"><%= stats.rejectedUsers %></h4></div></div>
     </div>
   </div>
 
@@ -30,6 +30,7 @@
             <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All</option>
             <option value="approved" <%= filters.status === 'approved' ? 'selected' : '' %>>Approved</option>
             <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+            <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
           </select>
           <button type="submit" class="btn btn-outline-primary">Apply</button>
         </form>
@@ -75,36 +76,52 @@
                   </td>
 
                   <td>
-                    <% if (emailClaim && emailClaim.verified) { %>
-                      <span class="badge bg-success">Verified</span>
+                    <% if (user.verificationStatus !== 'approved') { %>
+                      <span class="text-muted">—</span>
+                    <% } else if (emailClaim && emailClaim.verified) { %>
+                      <span class="badge bg-success">Approved</span>
                     <% } else { %>
                       <span class="badge bg-warning text-dark">Pending</span>
                     <% } %>
                   </td>
 
                   <td>
-                    <% if (user.verified) { %>
+                    <% if (user.verificationStatus === 'approved') { %>
                       <span class="badge bg-success">Approved</span>
+                    <% } else if (user.verificationStatus === 'rejected') { %>
+                      <span class="badge bg-danger">Rejected</span>
                     <% } else { %>
-                      <span class="badge bg-secondary">Unapproved</span>
+                      <span class="badge bg-secondary">Pending</span>
+                    <% } %>
+                    <% if (user.rejectionReason) { %>
+                      <div class="small text-danger mt-1"><strong>Reason:</strong> <%= user.rejectionReason %></div>
                     <% } %>
                   </td>
 
                   <td>
                     <div class="d-flex flex-column gap-2">
-                      <% if (!user.verified) { %>
+                      <% if (user.verificationStatus !== 'approved') { %>
                         <form action="/admin/approve-user/<%= user._id %>" method="POST">
                           <button type="submit" class="btn btn-sm btn-primary w-100">Approve User</button>
                         </form>
                       <% } %>
 
-                      <% if (emailClaim && !emailClaim.verified) { %>
+                      <% if (user.verificationStatus === 'approved' && emailClaim && !emailClaim.verified) { %>
                         <form action="/admin/verify/<%= user._id %>/email_verified" method="POST">
                           <button type="submit" class="btn btn-sm btn-success w-100">Verify Claim</button>
                         </form>
                       <% } %>
 
-                      <% if (user.verified && (!emailClaim || emailClaim.verified)) { %>
+                      <% if (user.verificationStatus !== 'approved' || (user.verificationStatus === 'approved' && emailClaim && !emailClaim.verified)) { %>
+                        <form action="/admin/reject-user/<%= user._id %>" method="POST">
+                          <div class="input-group input-group-sm">
+                            <input type="text" name="reason" class="form-control" placeholder="Rejection reason" required maxlength="220">
+                            <button type="submit" class="btn btn-outline-danger"><%= user.verificationStatus === 'approved' ? 'Reject Claim' : 'Reject' %></button>
+                          </div>
+                        </form>
+                      <% } %>
+
+                      <% if (user.verificationStatus === 'approved' && (!emailClaim || emailClaim.verified)) { %>
                         <span class="text-muted small">No pending action</span>
                       <% } %>
                     </div>
