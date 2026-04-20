@@ -190,7 +190,7 @@
     const qrCanvas = document.getElementById("qr-canvas");
     const qrWrapper = document.getElementById("qr-wrapper");
     const proofExpiry = document.getElementById("proof-expiry");
-    const activeProofCodeEl = document.getElementById("active-proof-code");
+    const proofCodeValueEl = document.getElementById("active-proof-code");
 
     const proofModalEl = document.getElementById("proofModal");
     const proofCode = document.getElementById("proof-code");
@@ -236,7 +236,7 @@
 
       latestProof = proof;
       if (proof.expiresAt) startExpiryCountdown(proof.expiresAt);
-      if (activeProofCodeEl) activeProofCodeEl.textContent = proof.code;
+      if (proofCodeValueEl) proofCodeValueEl.textContent = proof.code;
       return proof;
     }
 

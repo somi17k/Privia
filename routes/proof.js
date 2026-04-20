@@ -1,6 +1,7 @@
 const express = require("express");
 const crypto = require("crypto");
 const User = require("../models/User");
+const Proof = require("../models/Proof");
 const router = express.Router();
 const PROOF_TTL_MS = 30 * 1000;
 
@@ -26,13 +27,16 @@ router.get("/", ensureAuth, async (req, res) => {
     }
 
     const shouldRegenerate = req.query.regenerate === "1" || req.query.regenerate === "true";
-    const existingProof = user.activeProof;
-    if (!shouldRegenerate && existingProof?.code && existingProof?.expiresAt) {
-      const existingExpiry = new Date(existingProof.expiresAt);
-      if (existingExpiry > new Date()) {
+    if (!shouldRegenerate) {
+      const existingProof = await Proof.findOne({
+        userId: user._id,
+        expiresAt: { $gt: new Date() }
+      }).sort({ expiresAt: -1 }).lean();
+
+      if (existingProof) {
         return res.json({
           code: existingProof.code,
-          expiresAt: existingExpiry.toISOString()
+          expiresAt: new Date(existingProof.expiresAt).toISOString()
         });
       }
     }
@@ -43,16 +47,14 @@ router.get("/", ensureAuth, async (req, res) => {
       crypto.randomBytes(4).toString("hex").toUpperCase();
 
     // ⏱ Expiry (30 seconds)
-    const issuedAt = new Date();
-    const expiresAt = new Date(issuedAt.getTime() + PROOF_TTL_MS);
+    const expiresAt = new Date(Date.now() + PROOF_TTL_MS);
 
-    user.activeProof = {
+    await Proof.deleteMany({ userId: user._id });
+    await Proof.create({
       code: proofCode,
-      claimType: "email_verified",
-      issuedAt,
+      userId: user._id,
       expiresAt
-    };
-    await user.save();
+    });
 
     res.json({
       code: proofCode,

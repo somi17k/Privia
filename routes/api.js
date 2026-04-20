@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const User = require('../models/User');
+const Proof = require('../models/Proof');
 
 router.post('/proof', async (req, res) => {
   try {
@@ -46,6 +47,42 @@ router.post('/proof', async (req, res) => {
   } catch (err) {
     console.error('Proof API error:', err);
     res.status(500).json({ valid: false });
+  }
+});
+
+router.post('/verify-proof', async (req, res) => {
+  try {
+    const inputCode = typeof req.body?.code === 'string' ? req.body.code : '';
+    const code = inputCode.trim().toUpperCase();
+
+    if (!code) {
+      return res.json({ valid: false });
+    }
+
+    const proof = await Proof.findOne({ code });
+    if (!proof) {
+      return res.json({ valid: false });
+    }
+
+    if (new Date() > new Date(proof.expiresAt)) {
+      await Proof.deleteOne({ _id: proof._id });
+      return res.json({ valid: false, reason: 'expired' });
+    }
+
+    const user = await User.findById(proof.userId).lean();
+    if (!user || !user.verified) {
+      return res.json({ valid: false, reason: 'user not verified' });
+    }
+
+    return res.json({
+      valid: true,
+      user: {
+        name: user.name
+      }
+    });
+  } catch (err) {
+    console.error('Verify proof API error:', err);
+    return res.status(500).json({ valid: false });
   }
 });
 

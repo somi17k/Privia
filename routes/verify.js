@@ -1,6 +1,6 @@
 const express = require("express");
 const verifyClaim = require("../utils/verifyClaim");
-const User = require("../models/User");
+const Proof = require("../models/Proof");
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -27,36 +27,26 @@ router.post("/proof", async (req, res) => {
       return res.status(400).json({ valid: false });
     }
 
-    const user = await User.findOne({ "activeProof.code": code });
-    if (!user || !user.activeProof) {
+    const proof = await Proof.findOne({ code }).populate("userId");
+    if (!proof || !proof.userId) {
       return res.json({ valid: false });
     }
 
-    const expiresAt = new Date(user.activeProof.expiresAt);
+    const expiresAt = new Date(proof.expiresAt);
     if (new Date() > expiresAt) {
-      user.activeProof = undefined;
-      await user.save();
+      await Proof.deleteOne({ _id: proof._id });
+      return res.json({ valid: false, reason: "expired" });
+    }
+
+    if (!proof.userId.verified) {
       return res.json({ valid: false });
     }
 
-    const claimType = user.activeProof.claimType || "email_verified";
-    const claims = Array.isArray(user.claims) ? user.claims : [];
-    const hasVerifiedClaim = claims.some(
-      (claim) => claim.type === claimType && claim.verified
-    );
-
-    if (!hasVerifiedClaim) {
-      return res.json({ valid: false });
-    }
-
-    const validatedExpiresAt = user.activeProof.expiresAt;
-    user.activeProof = undefined;
-    await user.save();
+    await Proof.deleteOne({ _id: proof._id });
 
     return res.json({
       valid: true,
-      claimType,
-      expiresAt: validatedExpiresAt
+      expiresAt: expiresAt.toISOString()
     });
   } catch (err) {
     return res.status(500).json({ valid: false });

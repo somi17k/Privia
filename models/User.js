@@ -57,21 +57,6 @@ const UserSchema = new mongoose.Schema({
     }
   ],
 
-  activeProof: {
-    code: {
-      type: String
-    },
-    claimType: {
-      type: String
-    },
-    issuedAt: {
-      type: Date
-    },
-    expiresAt: {
-      type: Date
-    }
-  },
-
   date: {
     type: Date,
     default: Date.now

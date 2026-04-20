@@ -11,7 +11,7 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const User = require('./models/User');
+const Proof = require('./models/Proof');
 
 require('dotenv').config();
 
@@ -29,10 +29,7 @@ const db = require('./config/keys').mongoURI;
 const PROOF_CLEANUP_INTERVAL_MS = 30 * 1000;
 
 async function cleanupExpiredProofs() {
-  await User.updateMany(
-    { "activeProof.expiresAt": { $lte: new Date() } },
-    { $unset: { activeProof: 1 } }
-  );
+  await Proof.deleteMany({ expiresAt: { $lte: new Date() } });
 }
 
 // ✅ Connect to MongoDB
