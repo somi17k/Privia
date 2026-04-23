@@ -91,13 +91,13 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
       return res.redirect('/users/register');
     }
 
-    // 🔐 Encrypt email before saving
+    // Encrypt email before saving
     const encryptedEmail = CryptoJS.AES.encrypt(
       normalizedEmail,
       process.env.SECRET_KEY
     ).toString();
 
-    // ✅ Create new user
+    // Create new user
     const newUser = new User({
       name,
       email: encryptedEmail,
@@ -123,7 +123,7 @@ router.post('/register', upload.single("idProof"), async (req, res) => {
   }
 });
 
-// ✅ Login Route
+// Login Route
 router.post('/login',
   passport.authenticate('local', {
     successRedirect: '/dashboard',
@@ -165,7 +165,7 @@ router.post('/resubmit-proof', ensureAuthenticated, upload.single("idProof"), as
   }
 });
 
-// ✅ Logout Route (Flash-safe)
+// Logout Route (Flash-safe)
 router.get('/logout', (req, res, next) => {
   if (!req.isAuthenticated()) {
     return res.redirect('/users/login');

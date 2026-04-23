@@ -45,7 +45,7 @@ router.get("/", ensureAuth, async (req, res) => {
       }
     }
 
-    // 🔐 Generate clean proof code
+    // Generate clean proof code
     const proofCode =
       "PRIVIA-" +
       crypto.randomBytes(4).toString("hex").toUpperCase();

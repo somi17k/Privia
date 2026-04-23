@@ -6,9 +6,8 @@ const User = require('../models/User');
 
 module.exports = function (passport) {
 
-  /* =========================================================
-     LOCAL STRATEGY (LOGIN)
-     ========================================================= */
+  // LOCAL STRATEGY (LOGIN)
+
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
       try {
@@ -61,22 +60,20 @@ module.exports = function (passport) {
     })
   );
 
-  /* =========================================================
-     SESSION HANDLING
-     ========================================================= */
-
-  // ✅ Store ONLY MongoDB ID in session
+  //  SESSION HANDLING
+  // Store ONLY MongoDB ID in session
+  
   passport.serializeUser((user, done) => {
     done(null, user.id);
   });
 
-  // ✅ Restore FULL USER OBJECT (NO DECRYPTION HERE)
+  // Restore FULL USER OBJECT (NO DECRYPTION HERE)
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
       if (!user) return done(null, false);
 
-      // 🔐 IMPORTANT: return raw DB user
+      // IMPORTANT: return raw DB user
       return done(null, user);
     } catch (err) {
       console.error('Deserialize error:', err);

@@ -4,7 +4,7 @@ const CryptoJS = require('crypto-js');
 const User = require('../models/User');
 const { ensureAdmin } = require('../config/auth');
 
-// ✅ Admin dashboard
+// Admin dashboard
 router.get('/', ensureAdmin, async (req, res) => {
   try {
     const status = req.query.status === 'approved' || req.query.status === 'pending' || req.query.status === 'rejected'
@@ -110,7 +110,7 @@ router.get('/', ensureAdmin, async (req, res) => {
   }
 });
 
-// ✅ Admin verifies a claim
+// Admin verifies a claim
 router.post('/verify/:userId/:claimType', ensureAdmin, async (req, res) => {
   try {
     const { userId, claimType } = req.params;
@@ -140,7 +140,7 @@ router.post('/verify/:userId/:claimType', ensureAdmin, async (req, res) => {
   }
 });
 
-// ✅ Admin approves user manually
+// Admin approves user manually
 router.post('/approve-user/:userId', ensureAdmin, async (req, res) => {
   try {
     const userId = req.params.userId;

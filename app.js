@@ -17,14 +17,14 @@ require('dotenv').config();
 
 const app = express();
 
-// ✅ Passport Config
+// Passport Config
 require('./config/passport')(passport);
 
 // Verifier 
 app.use(express.json());
 app.use("/verify", require("./routes/verify"));
 
-// ✅ DB Config
+// DB Config
 const db = require('./config/keys').mongoURI;
 const PROOF_CLEANUP_INTERVAL_MS = 30 * 1000;
 
@@ -32,7 +32,7 @@ async function cleanupExpiredProofs() {
   await Proof.deleteMany({ expiresAt: { $lte: new Date() } });
 }
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB
 mongoose.connect(db, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -51,21 +51,21 @@ mongoose.connect(db, {
     console.error(err);
   });
 
-// ✅ EJS
+// EJS
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('layout', 'layout');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', false);
 
-// ✅ Middleware
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/uploads", express.static("uploads"));
 
-// ✅ Session (before passport + flash)
+// Session (before passport + flash)
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'secret',
@@ -75,14 +75,14 @@ app.use(
   })
 );
 
-// ✅ Passport
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Flash
+// Flash
 app.use(flash());
 
-// ✅ Global Variables
+// Global Variables
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
@@ -92,7 +92,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Routes
+// Routes
 const adminRoutes = require('./routes/admin');
 app.use('/admin', adminRoutes);
 app.use('/', require('./routes/index.js'));
@@ -103,7 +103,7 @@ app.get("/scanner", (req, res) => {
   res.render("scanner", { title: "Scanner" });
 });
 
-// ✅ Server
+// Server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
